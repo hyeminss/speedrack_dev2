@@ -1,0 +1,160 @@
+<!--
+- Created by user on 2022-07-04.
+-->
+
+<!-- A S Process New -->
+<template>
+
+
+
+    <lightning-card title="My Contact Record" icon-name="standard:contact">
+
+        <h3 slot="title">
+            <lightning-icon icon-name="utility:connected_apps" size="small"></lightning-icon>
+            AS_Process_New
+        </h3>
+        <lightning-breadcrumbs>
+            <lightning-breadcrumb label="A/S" href="http://example.com/parent"></lightning-breadcrumb>
+            <lightning-breadcrumb label="Case" href="http://example.com/case"></lightning-breadcrumb>
+        </lightning-breadcrumbs>
+
+        <!--<lightning-record-edit-form
+                record-id={recordId}
+                object-api-name={objectApiName}
+                onsubmit={handleSubmit}
+                onload={handleLoad}
+                onsuccess={handleSuccess}
+                onerror={handleError}>-->
+
+        <!--        <template if:true={accounts.data}>-->
+        <!--<template for:each={data} for:item="account">-->
+
+        <div class="slds-size_1-of-4">
+            <div class="wrapper">
+                <span>주문번호</span>
+                <span class="input-wrapper">
+                            <lightning-input type="text" label="123" name="searchRecord" onchange={inputKey}></lightning-input>
+                    <!--<lightning-input type="text" label="2" value={keyValue1}></lightning-input>-->
+                        </span>
+            </div>
+        </div>
+
+        <template for:each={keyValue1} for:item="key">
+
+            <div class="demo-only demo-only--sizing slds-grid slds-wrap" key={key.id}>
+
+
+                <div class="slds-size_1-of-4">
+                    <div class="wrapper">
+                        <span>거래처</span>
+                        <div class="input-wrapper">
+                            <lightning-input type="text" name="" value={key.Phone} disabled></lightning-input>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="wrapper">
+                        <span>A/S접수일(Industry)</span>
+                        <div class="input-wrapper">
+                            <lightning-input type="text" name="Industry" value={key.Industry}
+                                             onchange={handleIndustryChange}></lightning-input>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="wrapper">
+                        <span>A/S접수번호</span>
+                        <div class="input-wrapper">
+                            <lightning-input type="text" name="" value={key.AccountNumber}
+                                             disabled></lightning-input>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="wrapper">
+                        <span>거래처연락처</span>
+                        <div class="input-wrapper">
+                            <lightning-input type="text" name="" value={key.AccountNumber}
+                                             disabled></lightning-input>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="wrapper">
+                        <span>주문일자</span>
+                        <div class="input-wrapper">
+                            <lightning-input type="text" name="" value={key.AccountNumber} disabled></lightning-input>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="wrapper">
+                        <span>온라인주문번호</span>
+                        <div class="input-wrapper">
+                            <lightning-input type="text" name="" value={key.Phone} disabled></lightning-input>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="wrapper">
+                        <span>소비자명</span>
+                        <div class="input-wrapper">
+                            <lightning-input type="text" name="" value={key.Name} disabled></lightning-input>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="wrapper">
+                        <span>운송장번호</span>
+                        <div class="input-wrapper">
+                            <lightning-input type="text" name="" value={key.AccountNumber}
+                                             disabled></lightning-input>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="wrapper">
+                        <span>택배사</span>
+                        <div class="input-wrapper">
+                            <lightning-input type="text" name="" value={key.Name} disabled></lightning-input>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="wrapper">
+                        <span>소비자연락처</span>
+                        <div class="input-wrapper">
+                            <lightning-input type="text" name="Phone" value={key.Phone}
+                                             onchange={handlePhoneChange}></lightning-input>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="wrapper">
+                        <span>소비자주소</span>
+                        <div class="input-wrapper">
+                            <lightning-input type="text" name="Address__c" value={key.Site}
+                                             onchange={handleAddressChange}></lightning-input>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <lightning-checkbox-group name="Checkbox"
+                                              options={option}
+                                              value={value}
+                                              onchange={handleCheckboxChange}></lightning-checkbox-group>
+                </div>
+                <div>
+                    <lightning-button type="button" label="search2" variant="brand" onchange={inputKey}></lightning-button>
+                    <lightning-button type="button" slot="actions" label="Save Record" onclick={onUpdateRecord}
+                                      variant="brand"></lightning-button>
+                </div>
+            </div>
+            <!--        </template>-->
+        </template>
+        <!--            <template if:true={Account.error}>
+                        <c-error-panel errors={Account.error}></c-error-panel>
+                    </template>-->
+        <!--        </lightning-record-edit-form>-->
+    </lightning-card>
+</template>

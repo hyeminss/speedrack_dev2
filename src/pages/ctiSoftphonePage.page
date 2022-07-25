@@ -1,0 +1,992 @@
+<apex:page sidebar="false" showHeader="false" docType="html-5.0" id="thePage" lightningStylesheets="true" standardStylesheets="true" controller="Ctr_SoftphonePageController"> 
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- <script src="../../soap/ajax/53.0/connection.js" type="text/javascript"></script> -->
+    <!-- <apex:includeScript value="{!$Resource.jquery}"/> -->
+    <!-- <script type="text/javascript" src="/support/api/52.0/lightning/opencti_min.js"></script> -->
+    
+    <apex:includeScript value="{!URLFOR($Resource.clvs,'jquery.js')}"/>
+    
+    <apex:includeScript value="{!URLFOR($Resource.clvs,'jquery.dd.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Mytro,'adapter.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Mytro,'customEvent.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Mytro,'janus-0.4.4.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Mytro,'Stately.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Mytro,'webrtc-phone.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Mytro,'wsJanusApp.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Mytro,'wsJanusCapi.js')}"/>
+
+    <apex:includeScript value="{!URLFOR($Resource.clvs,'/js/ctiSoftphonePage.js')}"/>
+    
+    
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <apex:slds />
+    <apex:remoteObjects >
+        <!-- // 콜타입,콜ID,recURL,시작시간,종료시간,전화번호 -->
+        <apex:remoteObjectModel name="Task" jsShorthand="jsTask" fields="Id,Subject,CallType,Rec_URL__c,Call_StartTime__c,Call_EndTime__c,cphone__c,CallObject,TaskSubType"/>
+
+        <!-- <apex:remoteObjectModel name="Extension_Phone_Book__c" jsShorthand="jsEx" fields="Id,Name,Phone__c,Department__c,IsDepartment__c,Title__c"/> -->
+       
+    </apex:remoteObjects>
+    
+    <head>
+        <!-- <apex:stylesheet value="{!URLFOR($Resource.clvs, '/css/ctiSoftphonePage.css')}"/>     -->
+        <style>
+        header{
+        /* width:96%; */
+        width:100%;
+        height: 190px; 
+        /* background-color: aquamarine; */
+        margin-bottom: 1rem;
+        border: 1px solid rgb(221, 219, 218);
+        border-radius: .25rem;
+        background: rgb(173 217 255 / 30%);
+
+        box-shadow: 0 2px 2px 0 rgb(0 0 0 / 10%);
+        background-clip: padding-box;
+        margin-top: 5px;
+        /* padding: 5px; */
+        padding-left: 5px;
+        padding-right: 5px;
+
+        }
+
+        .dialPadDiv{
+        text-align: left;
+        font-weight: bolder;
+        margin-top: 10px;
+        }
+        .dialPadInnerDiv{
+        display: inline-block;
+        cursor: pointer;
+        }
+        .dialPadInnerDiv:hover{
+        transform: scale(1.1,1.1);
+        }
+
+        .keypad_num_div{
+        width: 100%;
+        min-height: 50px;
+        border: 1px solid black;
+        }
+        #keypad_table tr td{
+        text-align: center;
+        height: 30px;
+        font-size: 20px;
+        }
+        .keypad_num{
+        border: 1px solid rgb(199, 199, 199);
+        cursor: pointer;
+        }
+        .keypad_num:hover{
+        opacity: 0.5;
+        }
+
+        .wrapperDiv{
+
+        text-align: center;
+        width: 375px;
+        }
+        #dtmf_keypad{
+        display: inline-block;
+        width: 200px;
+        height: 130px;
+        }
+        #click_num_label{
+        margin-left:50px;
+        }
+        #click_num{
+        margin-left:20px;
+        color: gray;
+        }
+
+        footer{
+
+        }
+        #watchDisplay{
+        text-align: center;
+        margin-top: 5px;
+        height: 60px;
+        display: flex;
+        /* padding: 10px; */
+        }
+        .watchDiv{
+        margin:auto;
+        width:100%;
+        }
+
+        .watch-display{
+        text-align: center;
+
+        }
+
+        #callIcon{
+        width:20px; height: 20px;
+        display:none;
+
+        }
+        .softphonBtnTable{
+        width:100%;
+        margin-top:10px;
+        }
+        .softphonBtnTable tr{
+        height: 35px;
+        }
+
+        .sfdc_icon{
+        /* width:20px;
+        height: 20px; */
+        }
+
+        .userInfoFont{
+        font-size: 12px;
+        font-family: sans-serif;
+        font-weight: bolder;
+        }
+
+
+        .info-table{
+        width: 100%;
+
+        }
+        .info-table tr{
+        height: 30px;
+        }
+        .sfdc_btn{
+
+        /* width: 85px;
+        font-size: 11px !important; */
+        width: 65px;
+        font-size: 10px !important;
+        padding: 0 !important;
+
+        }
+        #sMsg{
+        font-weight: bolder;
+        }
+        #select_parent{
+        /* font-size: 10px; */
+        vertical-align: top;
+        }
+        .select2-container--default .select2-results>.select2-results__options {
+        max-height: none;
+        }
+
+
+        .select2-selection__rendered {
+        line-height: 31px !important;
+        }
+        .select2-container .select2-selection--single {
+        height: 31px !important;
+        }
+        .select2-selection__arrow {
+        height: 32px !important;
+        }
+        #select2-statusSelect-container{
+        font-size:12px !important;
+        }
+
+        #userListDiv{
+            width:100%; 
+            height: 120px; 
+            overflow: auto; 
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .userBtn{
+            margin-bottom:5px !important;
+            width: 140px !important;
+            font-size: 11px !important;
+            white-space: nowrap !important;
+
+        }
+        #txRequestNum{
+            width:100px;
+        }
+
+        .txReqBtn{
+            font-size: 11px !important;
+        }
+
+        #txRequestBtn{
+            width:60px !important
+        }
+        #refreshBtn{
+            width:90px !important;
+        }
+        #selectCancelBtn{
+            width:90px !important;
+        }
+
+        #exSearchInput{
+            float: left;
+            width: 40% !important;
+            
+        }
+        #exSearchBtn{
+            font-size: 11px !important;
+            float: left;
+            margin-left: 10px;
+        }
+        #exCancel{
+            font-size: 11px !important;
+            float:right;
+        }
+
+        #exUserListDiv{
+            width:100%; 
+            height: 120px; 
+            overflow: auto; 
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        #searchResultTable{
+            width: 100% !important;
+        }
+        .exSearchTable{
+            font-size: 9px !important;
+            height: 18px !important;
+        }
+
+        .exDeptRow{
+            background-color: beige !important;
+        }
+        .extensionListDiv{
+            margin-top: 5px;
+        }
+        .transferDiv{
+            margin-top: 5px;
+        }
+
+        #TxCancel{
+            width: 80px;
+        }
+
+        #ivr_data{
+            /* display:block; */
+            /* position: absolute;
+            right: 30px;
+            top: 90px; */
+        }
+
+        .infoTable{
+            width:90%;
+            margin:auto;
+        }
+
+        .infoTable_tr{
+            height: 10px !important;
+        }
+
+        .infoTable_td{
+            /* border: 1px solid black; */
+            text-align: center !important;
+        }
+        .imgTd{
+            width: 20%;
+        }
+       
+        </style>
+        <script>
+        
+        /*
+        wsJanusCapi.js 에서 소켓 연결이 종료될 때 
+        사용자가 직접 종료하지 않은 상태를 체크하기위한 flag 변수
+        */
+        // 사용자 로그아웃 선택시 true 로 변경
+        var userLogoutFlag = false;
+
+        var sforce = parent.sforce;
+        var watch;
+        var holdMode = false;
+        var muteMode = false;
+        var isFirstCon = false;
+        
+        var txSender = false;
+        var txReceiver = false;
+        var txSenderNum = '';
+        var txReceiverNum = '';
+        var txCustNum = '';
+        var isCustCon = false;
+
+        var extension ='';
+        
+
+        /* 내선연결 클릭하여 호 전환 시 Flag 변수*/
+        var isExUser = false;
+
+        var loginUserId = '{!ctiUserId}';
+
+        /*
+        호전환 모드 
+        Transfer 
+        TransferWarm
+        */
+        var transferMode = "TransferWarm"; 
+
+        /* 
+        전화번호 하이픈 모드
+        // true: 전화번호에 하이픈 사용 false: 전화번호에 하이픈 사용안함
+         */
+        var numberAddDash = false;   
+        /*
+        _CS 수정
+        */
+        var SFDC_CALLINFO = {
+        custName:"",    /* 고객이름 */
+        cphone: "",     /* 고객 전화번호 */
+        whoId: "",   /* 고객레코드ID_SFDC */
+        whatId: "", /* 관련항목 ID_SFDC */
+        
+        uid: "",        /* uid ID */
+        role: "",       /* role */
+        state: "",      
+        queue_id: "",   /* Queue ID */
+        queue: "",
+        call_type: "",
+        cchan: "",      /* // SIP/carvajoSIP-0000010e */
+        achan:"",       /* // SIP/63810-00000110 */
+        ivr_tag: "",
+        ivr_data: "",
+        dnis_memo: "",
+        queue_waittime: "",
+        autopause: "",
+        /* // 시간정보 */
+        time: "",        /* // 11:15:59 */
+        start_time: "",
+        end_time: "",
+       
+
+        log: function(){ /* log 출력 */
+            console.log("SFDC_CALLINFO = " + JSON.stringify(this));
+        },
+        clear: function (){ /* 초기화 */
+        this.custName = ""; 
+        this.cphone = ""; 
+        this.whoId = ""; 
+        this.whatId = "";
+        this.uid = "";
+        this.role = "";
+
+        this.state = "";
+        this.queue_id = "";
+        this.queue = "";
+        this.call_type = "";
+        this.cchan = "";
+        this.achan = "";
+        this.ivr_tag = "";
+        this.ivr_data = "";
+        this.dnis_memo = "";
+        this.queue_waittime = "";
+        this.autopause = "";
+        
+        this.time= "";        /* 11:15:59 */
+        this.start_time= "";
+        this.end_time= "";
+        }
+        
+        };
+
+        /*
+        "evt":"call",
+        "sub":"QueueRing",
+        "time":"09:49:08",
+        "uid":"101-1630025337.819",
+        "role":"a",
+        "state":"Ring",
+        "queue_id":"414",
+        "queue":"ittest1",
+        "call_type":"Inbound",
+        "cchan":"SIP/carvajoSIP-000000e4",
+        "cphone":"01086135267",
+        "ivr_tag":"N1000",
+        "ivr_data":"",
+        "dnis_memo":"",
+        "queue_waittime":"00:00:00",
+        "autopause":"all"
+        
+        */
+
+        window.addEventListener('DOMContentLoaded', function(){
+                    
+                        progressOn();
+                        
+        });
+     
+        window.addEventListener("load",
+                function() {
+
+                    
+                        var uId = '{!ctiUserId}';
+                        var ex = '{!ctiExtension}';
+                        extension = ex;    
+                     /*  alert(uId+' //// '+ex); */
+
+                        WindowLoad(uId, ex);
+                        setTimeout(login,2000);
+
+                var parentElement = $("#select_parent");
+                $("#statusSelect").select2({
+                dropdownParent: parentElement,
+                minimumResultsForSearch: Infinity
+                });
+                
+                    });
+                    
+          
+            
+        </script>
+
+
+        </head>
+        <body>
+            <div id="audio_view" style="display:none;">
+                <video  id="remote-stream-video" class="embed-responsive-item" autoplay="true"></video>
+                <video  id="local-stream-video" class="embed-responsive-item" autoplay="true"></video>
+                <audio  id="remote-stream-audio" autoplay="true"></audio>
+                </div>
+                
+            <div id='mask' style='position:absolute; z-index:9000; background-color:#000000; display:none; left:0; top:0; text-align : center;'>
+                <img src="{!URLFOR($Resource.clvs,'img/Spinner.gif')}" style='display: block; margin: 0px auto; width:50px; height: 50px;' id="loadingImg"/>
+            </div>
+            <div class="wrapperDiv">
+            <header>
+                <div class="mainDiv">
+               <div class="headerDiv">
+                
+                
+               <!--  <apex:form > 
+                
+                    <apex:actionFunction action="{! saveCallLog}" name="saveCallLog" >
+                        <apex:param name="callType" assignTo="{! newTask.callType}" value=""/>
+                        <apex:param name="callId" assignTo="{! newTask.callId}" value=""/>
+                        <apex:param name="recURL" assignTo="{! newTask.recURL}" value=""/>
+                        <apex:param name="startTime" assignTo="{! newTask.startTime}" value=""/>
+                        <apex:param name="endTime" assignTo="{! newTask.endTime}" value=""/>
+                        <apex:param name="cphone" assignTo="{! newTask.cphone}" value=""/>
+                        
+                    </apex:actionFunction>
+                
+
+                </apex:form> -->
+                
+
+                
+                <table class="softphonBtnTable">
+                    <tr>
+                        <td>
+                            <span id ="select_parent">
+                            <select id="statusSelect" onchange="statusSelectChange(true)" style="width:80px !important">
+                                <option value="ibMode" >대기</option>
+                                <option value="notReady">후처리</option>
+                                <option value="away">자리비움</option>
+                                <option value="rest">휴식</option>
+                                <option value="lunch">식사</option>
+                                <option value="meeting">회의</option>
+                                <option value="seminar">교육</option>
+                                <option value="etc">기타</option>
+                                <option value="logout">로그아웃</option>
+                            </select>
+                        </span>
+                        </td>
+                        <td>
+                            <!-- <button id="Inbound" onclick="EE('ibMode')" title="IB모드" class="dual" disabled=""><span><i class="fa fa-phone" aria-hidden="true"></i>IB모드</span><p>IN</p></button> -->
+                            <!-- <button id="Inbound" onclick="" title="대기" class="m_l_20 btn slds-button slds-button_brand sfdc_btn" disabled=""><span><i class="fa fa-phone" aria-hidden="true"></i>대기</span>
+                            </button> -->
+                                <button id="Stay" onclick="ibModeClick()" title="대기" class="m_l_20 btn slds-button slds-button_brand sfdc_btn" disabled="">
+                                <span><i class="fa fa-phone" aria-hidden="true"></i>대기</span>
+                            </button>
+                        </td>
+                        <td>
+                            <button id="Dial" onclick="dialClick()" title="다이얼" class="m_l_20 btn slds-button slds-button_brand sfdc_btn" disabled="">
+                                <span><i class="fa fa-hand-pointer-o" aria-hidden="true"></i>전화걸기</span>
+                            </button>
+                        </td>
+                        <td>
+                            <button id="Answer" onclick="answerClick()" title="전화받기" disabled="" class="btn slds-button slds-button_brand sfdc_btn"><span><i class="fa fa-volume-control-phone " aria-hidden="true"></i>전화받기</span></button>            
+                        </td>
+                        <td>
+                            <button id="Hangup" onclick="hangupClick()" title="끊기/거절" disabled="" class="btn slds-button slds-button_brand sfdc_btn"><span><i class="fa fa-ban " aria-hidden="true"></i>끊기/거절</span></button>            
+                        </td>
+                    </tr>
+                    <tr>
+                        
+                    <td>
+                        
+                        
+                        <div class="tfBtn_div" style="display:none;">
+                            <button id="TxCancel" onclick="txCancelClick()" disabled="" title="전환취소" class="btn slds-button slds-button_brand sfdc_btn"> 전환취소  </button>
+                            <!-- <button id="TxComplete" onclick="txCompleteClick()" disabled="" title="전환완료" class="btn slds-button slds-button_brand sfdc_btn"> 전환완료 </button> -->
+                        </div>
+                        
+                    </td>
+                    <td >
+                        <!-- <button id="exSelectBtn" onclick="exSelectClick()" disabled="" title="내선연결" class="btn slds-button slds-button_brand sfdc_btn"> 내선연결 </button> -->
+                        <!-- <div class="tfBtn_div" style="display:none;"></div> -->
+                    </td>
+                    <td>
+                        <button id="TransferCold" onclick="transferClick()" disabled="" class="btn slds-button slds-button_brand sfdc_btn">   호전환<!--Cold호전환-->  </button>
+                        <!-- transfer() -->
+                    </td>
+                    <td>
+                        <button id="Mute" onclick="muteClick()" title="음소거" disabled="" class="btn slds-button slds-button_brand sfdc_btn"><span><i  aria-hidden="true"></i>음소거</span></button>
+                    </td>
+                    <td>
+                        <button id="Hold" onclick="holdClick()" title="홀드" disabled="" class="btn slds-button slds-button_brand sfdc_btn"><span><i  aria-hidden="true"></i>홀드</span></button>
+                    </td>
+                    
+                    </tr>    
+
+                    <!-- info -->
+                    <tr>
+                        <td >
+                            <span class="slds-icon_container slds-icon-custom-custom22 sfdc_icon " title="CTI ID">
+                                <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                <!-- <use xlink:href="/assets/icons/standard-sprite/svg/symbols.svg#avatar"></use> -->
+                                <use xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/standard-sprite/svg/symbols.svg#avatar')}"></use>
+                                
+                                </svg>
+                                <span class="slds-assistive-text"></span>
+                            </span>
+                            <apex:outputText styleClass="userInfoFont" value="   {!ctiUserId}"/>
+                        </td>
+                       
+                        <td colspan="4" rowspan="2" style=" padding-right:5px;"> <!-- padding-left:5px; -->
+
+                                <!-- 시계화면 -->
+                                <div id="watchDisplay">
+                                    <div class="watchDiv">
+                                 <!--    <img src = "{!URLFOR($Resource.clvs, '/img/Inbound_call.gif')}" id="callIcon"/>
+                                    <span id="ivr_data"></span>
+                                    <span id="sMsg">대기</span> <span id="sNum"></span>
+                                    <div id="watchDp" class="watch-display">00:00:00</div>
+                                 -->
+
+                                        <table class="infoTable">
+                                            <tr class="infoTable_tr">
+                                                <!-- <td class="infoTable_td imgTd" rowspan="3"><img src = "{!URLFOR($Resource.clvs, '/img/Inbound_call.gif')}" id="callIcon"/></td> -->
+                                                <td class="infoTable_td"><span id="ivr_data"></span></td>
+                                            </tr>
+                                            <tr class="infoTable_tr">
+                                                <td class="infoTable_td"><img src = "{!URLFOR($Resource.clvs, '/img/Inbound_call.gif')}" id="callIcon"/><span id="sMsg">대기</span> <span id="sNum"></span></td>
+                                                
+                                            </tr>
+                                            <tr class="infoTable_tr">
+                                                <td class="infoTable_td"><div id="watchDp" class="watch-display">00:00:00</div></td>
+                                                
+                                            </tr>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+                                <!-- 조작버튼 -->
+                                <div id="watchController" style="display:none;">
+                                    <button id="startBtn" class="watch-button" value="play">
+                                        <span class="slds-icon_container slds-icon-utility-announcement" title="Description of icon when needed">
+                                            <svg class="slds-icon slds-icon-text-default slds-icon_xx-small" aria-hidden="true">
+                                                <use xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/utility-sprite/svg/symbols.svg#play')}"></use>
+                                            </svg>
+                                            <span class="slds-assistive-text">Description of icon when needed</span>
+                                        </span>
+                                    </button>
+                                    <button id="pauseBtn" class="watch-button" value="pause">
+                                        <span class="slds-icon_container slds-icon-utility-announcement" title="Description of icon when needed">
+                                            <svg class="slds-icon slds-icon-text-default slds-icon_xx-small" aria-hidden="true">
+                                                <use xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/utility-sprite/svg/symbols.svg#pause')}"></use>
+                                            </svg>
+                                            <span class="slds-assistive-text">Description of icon when needed</span>
+                                        </span>
+                        
+                                    </button>
+                                    <button id="stopBtn" class="watch-button" value="stop">
+                                        <span class="slds-icon_container slds-icon-utility-announcement" title="Description of icon when needed">
+                                            <svg class="slds-icon slds-icon-text-default slds-icon_xx-small" aria-hidden="true">
+                                                <use xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/utility-sprite/svg/symbols.svg#stop')}"></use>
+                                            </svg>
+                                            <span class="slds-assistive-text">Description of icon when needed</span>
+                                        </span>
+                                    </button>
+                                </div>
+                            <!-- </div> -->
+                            <!-- 스톱워치 기능 추가 구문 끝 -->
+
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td >
+                            <span class="slds-icon_container slds-icon-custom-custom22 sfdc_icon " title="내선번호">
+                                <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                  <!-- <use xlink:href="/assets/icons/custom-sprite/svg/symbols.svg#custom5"></use> -->
+                                  <use xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/custom-sprite/svg/symbols.svg#custom22')}"></use>
+                                </svg>
+                                <span class="slds-assistive-text"></span>
+                            </span>  
+                            <apex:outputText styleClass="userInfoFont" value="   {!ctiExtension}"/>
+                        </td>
+                    </tr>
+
+                    <!-- info END -->
+                </table>
+                
+            
+
+            <apex:form >
+            <apex:actionFunction action="{!logoutDo}" name="logoutDo">
+            </apex:actionFunction>
+            </apex:form>
+                
+                 
+
+                
+
+                <!-- <select style="widt:200px;" id="testSelect">
+                    <option value="ibMode" title="{!URLFOR($Resource.clvs, '/img/Inbound_call.gif')}">대기</option>
+                    <option value="notReady">후처리<img src="{!URLFOR($Resource.clvs, '/img/Inbound_call.gif')}" /></option>
+                </select> -->
+
+                
+
+                
+                <!-- 
+                <button id="webrtcOn" title="WEBRTC" style="color:green" disabled=""><span><i class="fa fa-microphone" aria-hidden="true"></i>WEBRTC</span></button>
+                <button id="webrtcOff" title="WEBRTC OFF" style="color:red" disabled=""><span><i class="fa fa-microphone-slash" aria-hidden="true"></i>WEBRTC OFF</span></button>
+                 -->
+
+                <!-- 
+                <div class="alertDiv">
+                    <span id="incomingcall_msg"></span>
+                </div> -->
+            </div>
+            <div class="dialPadDiv">
+                <div class="dialPadInnerDiv" onclick="dialPadShow()">
+                <span class="slds-icon_container slds-icon-standard-apps sfdc_icon " title="다이얼패드" >
+                    <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                      <!-- <use xlink:href="/assets/icons/custom-sprite/svg/symbols.svg#custom5"></use> -->
+                      <use xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/standard-sprite/svg/symbols.svg#apps')}"></use>
+                    </svg>
+                    <span class="slds-assistive-text"></span>
+                </span>  
+                <!-- <apex:outputText styleClass="userInfoFont" value="ㅁ"/> -->
+                <span>DialPad </span><span id="dialPadStatus">▲</span> 
+                </div>
+                <span id="click_num_label" style="display:none;">입력번호: </span><span id="click_num"></span>
+            </div>
+            
+            </div>
+            <!-- mainDiv End -->
+
+
+            <!-- 내선번호 선택 화면 -->
+            <div class = "extensionListDiv" style="display:none;">
+                <div style="height: 30px !important;">
+                    <input type="text" id="exSearchInput" class="slds-input" placeholder="이름or부서 검색" onkeyup="exSearchInputEnter(event)"/>
+                    <button id="exSearchBtn" onclick="exSearchBtnClick()" class="btn slds-button slds-button_brand">검색</button> 
+                    <button id="exCancel" onclick="exCancel()" class="btn slds-button slds-button_brand">선택취소</button>  
+                </div>
+
+                <div id ="exUserListDiv" >
+
+                    <table id="searchResultTable" class="slds-table slds-table_cell-buffer slds-table_bordered">
+                        <thead>
+                            <tr class="slds-line-height_reset exSearchTable">
+                                <th class="exSearchTable" scope="col">
+                                    <div class="slds-truncate" title="부서">부서</div>
+                                </th>
+                                <th class="exSearchTable" scope="col">
+                                    <div class="slds-truncate" title="이름">이름</div>
+                                </th>
+                                <!-- <th class="" scope="col">
+                                    <div class="slds-truncate" title="직급">직급</div>
+                                </th> -->
+                                <th class="exSearchTable" scope="col">
+                                    <div class="slds-truncate" title="전화번호">전화번호</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchResultTableBody">
+                            <!-- 
+                            <tr class="slds-hint-parent">
+                                <th data-label="부서" scope="row">
+                                <div class="slds-truncate" title="">독자관리국</div>
+                                </th>
+                                <td data-label="이름">
+                                    <div class="slds-truncate" title="">한겨레</div>
+                                </td>
+                                <td data-label="직급">
+                                    <div class="slds-truncate" title="">팀장</div>
+                                </td>
+                                <td data-label="전화번호">
+                                    <div class="slds-truncate" title=""><a href="javascript:void(0);" tabindex="-1">0212345678</a></div>
+                                </td>
+                            </tr>
+                            -->
+                        
+                        </tbody>
+                      </table>
+
+
+
+                </div>
+
+            </div>
+            <!-- 내선번호 선택 화면  END -->
+
+
+            <div class="transferDiv" style="display:none;">
+                <div>
+                    <!-- <input type="phone" id="txRequestNum" class="slds-input" placeholder="번호입력"/>
+                    <button id="txRequestBtn" onclick="txRequestBtnClick()" class="btn slds-button slds-button_brand txReqBtn">연결</button>  -->
+                    <button id="refreshBtn" onclick="userListOpen()" class="btn slds-button slds-button_brand txReqBtn">새로고침</button>
+                    <button id="selectCancel" onclick="selectCancel()" class="btn slds-button slds-button_brand txReqBtn">선택취소</button>  
+                </div>
+
+                <div id ="userListDiv" ></div>
+
+
+            </div>
+        
+            </header>
+
+
+            <div style="text-align: center" > <!-- style="float: right;margin-right: 30px;margin-top: -125px;" -->
+                <div id="dtmf_keypad" style="display:none;">
+                    <!-- <div class="keypad_num_div"></div> -->
+                    <table id="keypad_table" cellpadding="5" cellspacing="3">
+                        <tbody><tr>
+                            <td class="keypad_num" onclick="keypadNumClick('1')">1</td>
+                            <td class="keypad_num" onclick="keypadNumClick('2')">2</td>
+                            <td class="keypad_num" onclick="keypadNumClick('3')">3</td>
+                        </tr>
+                        <tr>
+                            <td class="keypad_num" onclick="keypadNumClick('4')">4</td>
+                            <td class="keypad_num" onclick="keypadNumClick('5')">5</td>
+                            <td class="keypad_num" onclick="keypadNumClick('6')">6</td>
+                        </tr>
+                        <tr>
+                            <td class="keypad_num" onclick="keypadNumClick('7')">7</td>
+                            <td class="keypad_num" onclick="keypadNumClick('8')">8</td>
+                            <td class="keypad_num" onclick="keypadNumClick('9')">9</td>
+                        </tr>
+                        <tr>
+                            <td class="keypad_num" onclick="keypadNumClick('*')">*</td>
+                            <td class="keypad_num" onclick="keypadNumClick('0')">0</td>
+                            <td class="keypad_num" onclick="keypadNumClick('#')">#</td>
+                        </tr>
+                        </tbody></table>
+                </div>
+            </div>
+
+
+
+
+            <!-- <iframe id="lightning" border="none"  style="border:0;height:100vh; width:100vw; overflow: hidden;" src="ctiMainPage"></iframe> -->
+            <!-- <iframe id="lightning" border="none"  style="border:0;height:450px; width:100vw; " src="ctiMainPage"></iframe> -->
+            <!-- <iframe id="lightning" border="none"  style="border:0;height:450px; width:100vw; " src="searchPage"></iframe> -->
+            
+            <iframe id="lightning" border="none"  style="border:0;height:500px; width:100vw; display:block; " src="{!IF(ctiExtension == '63815','searchPage' ,'ctiSearchPage')}"></iframe>
+                                                                                <!-- width:100vw; -->
+            <footer>
+
+<!-- display:none; -->
+<div style="height:100;width:400;border:1px solid green;font-size:11px; display:none;"> <!-- position:fixed;top:5px;right:5px; -->
+    <table style="width:480px;text-align:center" border="1px">
+        <tbody><tr>
+            <th>상담원</th><th>전화기</th><th>모드</th><th>상태</th><th>세션</th><th>갱신</th><th>호타입</th>
+        </tr>
+        <tr>
+            <td style="color:blue" onclick="changeAgent()" id="userid">1600</td>
+            <td style="color:blue" onclick="changePhone()" id="phone">1600</td>
+            <td id="mode">Logout</td>
+            <td id="state">Idle</td>
+            <td id="session">None</td>
+            <td id="time">00:00:00</td>
+            <td id="call_type">Idle</td>
+        </tr>
+        <tr>
+            <td colspan="7" id="ws-info"><span style="color:green">Using Native WebSocket (5002)</span></td>
+        </tr>
+        </tbody></table>
+</div>
+
+<!-- display:none; -->
+
+
+            </footer>
+
+
+
+
+            <div class="warp" style="display:none;" > <!-- style="display:none;" -->
+            <div class="row basicarea">
+                <div class="inner_row" style="display:none">
+                    <div id="status_line"></div>
+                    <div class="form-group col">
+                        <div class="input-group embed-responsive embed-responsive-16by9">
+                            <span class="local-text">Remote</span>
+                            <video controls="" autoplay="" id="remote-stream-video" class="embed-responsive-item"></video>
+                        </div>
+                        <div class="input-group embed-responsive embed-responsive-16by9 remote">
+                            <span class="remote-text">Local</span>
+                            <video autoplay="" id="local-stream-video" class="embed-responsive-item"></video>
+                            <audio autoplay="" id="remote-stream-audio"></audio>
+                        </div>
+                    </div>
+                </div>
+                <div class="inner_row">
+                    <button id="Logout" onclick="logoutCheck();" title="로그아웃" class="m_l_20" style="margin-left:8px" disabled="">로그아웃<span><i class="fa fa-sign-out" aria-hidden="true"></i></span></button>
+                    <button id="NotReady" onclick="EE('notReady')" title="NotReady" disabled=""><span><i class="fa fa-spinner" aria-hidden="true"></i>NotReady</span></button>
+                    <button id="Inbound" onclick="EE('ibMode')" title="IB모드" class="dual" disabled=""><span><i class="fa fa-phone" aria-hidden="true"></i>IB모드</span><p>IN</p></button>
+                    <button id="Outbound" onclick="EE('obMode')" title="OB모드" class="dual" disabled=""><span><i class="fa fa-phone" aria-hidden="true"></i>OB모드</span><p>OUT</p></button>
+        
+                    
+                    
+                    
+                    <button id="Away" onclick="EE('away')" title="자리비움" class="m_l_20" disabled=""><span><i class="fa fa-external-link" aria-hidden="true"></i>자리비움</span></button>
+                    <button id="Rest" onclick="EE('rest')" title="휴식" disabled=""><span><i class="fa fa-coffee" aria-hidden="true"></i>휴식</span></button>
+                    <button id="Lunch" onclick="EE('lunch')" title="식사" disabled=""><span><i class="fa fa-cutlery" aria-hidden="true"></i>식사</span></button>
+                    <button id="Meeting" onclick="EE('meeting')" title="회의" disabled=""><span><i class="fa fa-users" aria-hidden="true"></i>회의</span></button>
+                    <button id="Seminar" onclick="EE('seminar')" title="교육" disabled=""><span><i class="fa fa-pencil-square-o" aria-hidden="true"></i>교육</span></button>
+                    <button id="Etc" onclick="EE('etc')" title="기타" disabled=""><span><i class="fa fa-asterisk" aria-hidden="true"></i>기타</span></button>
+                    <button id="TransferCold" onclick="transfer()" disabled="">   바로전환<!--Cold호전환-->  </button>
+                    <button id="GetState" onclick="EE('getState')" style="display:none" disabled=""> 상태체크 </button>
+                    <button id="Hijack" onclick="EE('hijack')" disabled="" title="당겨받기">당겨받기 </button>
+                </div>
+        
+                <div class="inner_row">
+                    <div class="dashboardBox" style="margin-bottom: 10px">
+                        <table>
+                            <tbody><tr>
+                                <th>상담원</th>
+                                <th>전화기</th>
+                                <th>모드</th>
+                                <th>상태</th>
+                                <th>세션</th>
+                                <th>갱신</th>
+                                <th>호타입</th>
+                                <th>인입번호</th>
+                                <th>인입구분</th>
+                            </tr>
+                            <tr>
+                                <td class="point" onclick="changeAgent()" id="userid">2118240</td>
+                                <td class="point" onclick="changePhone()" id="phone"></td>
+                                <td id="mode">Logout</td>
+                                <td id="state">Idle</td>
+                                <td id="session">None</td>
+                                <td id="time">19:21:28</td>
+                                <td id="call_type">Idle</td>
+                                <td id="in_number"><input id="tel" style="width:90px"/></td>
+                                <td id="ivr_for_tag"></td>
+                            </tr>
+                            </tbody></table>
+                    </div>
+                    <div class="iphone-toggle-buttons m_l_20" style="display:none" title="자동받기 설정">
+                        <ul>
+                            <li><label for="auto-answer"><input type="checkbox" name="auto-answer" id="auto-answer"/><span>checkbox 0</span></label></li>
+                        </ul>
+                    </div>
+                    
+                    <button id="Login" onclick="EE('login')" title="로그인"><span><i class="fa fa-sign-in" aria-hidden="true"></i>로그인</span></button>
+                    <button id="webrtcOn" title="WEBRTC" style="display:none;color:green" disabled=""><span><i class="fa fa-microphone" aria-hidden="true"></i>WEBRTC</span></button>
+                    <button id="webrtcOff" title="WEBRTC OFF" style="color:red" disabled=""><span><i class="fa fa-microphone-slash" aria-hidden="true"></i>WEBRTC OFF</span></button>
+                </div>
+                <!-- <div style="float: right;margin-right: 30px;margin-top: -125px;">
+                    <div id="dtmf_keypad">
+                        <table id="keypad_table" cellpadding="5" cellspacing="3">
+                            <tbody><tr>
+                                <td onclick="sendDTMF('1')">1</td>
+                                <td onclick="sendDTMF('2')">2</td>
+                                <td onclick="sendDTMF('3')">3</td>
+                            </tr>
+                            <tr>
+                                <td onclick="sendDTMF('4')">4</td>
+                                <td onclick="sendDTMF('5')">5</td>
+                                <td onclick="sendDTMF('6')">6</td>
+                            </tr>
+                            <tr>
+                                <td onclick="sendDTMF('7')">7</td>
+                                <td onclick="sendDTMF('8')">8</td>
+                                <td onclick="sendDTMF('9')">9</td>
+                            </tr>
+                            <tr>
+                                <td onclick="sendDTMF('*')">*</td>
+                                <td onclick="sendDTMF('0')">0</td>
+                                <td onclick="sendDTMF('#')">#</td>
+                            </tr>
+                            </tbody></table>
+                    </div>
+                </div> -->
+        
+            </div>
+        
+            <div class="row" style="display:none">
+                <input id="js2vb" size="100"/>  VB로 명령/메시지 전달  <br/>
+                <input id="vb2js" size="100" onchange="vbEvent()"/>  VB에서 메시지 받음
+                <div id="custEv" style="display:none"></div>
+                <div id="queue-div"></div>
+                <div class="leftBtnBox">
+                    <hr/>
+                    <button id="Answer" onclick="EE('answer')" disabled="">    전화받기 </button>
+                    <button id="Hijack" onclick="EE('hijack')" disabled="">    당겨받기 </button>
+                    <br/>
+        
+                    <hr/>
+                    <button id="Campaign" onclick="EE('cmMode')" disabled="">   캠페인   </button>
+                    <button id="TransferCold" onclick="EE('transferCold')" disabled="">   Cold호전환  </button>
+                    <button id="TransferWarm" onclick="EE('transferWarm')" disabled="">   Warm호전환  </button>
+                    <button id="Transfer" onclick="EE('transfer')" disabled="">   Attend호전환</button>
+                    <button id="TxComplete" onclick="EE('txComplete')" disabled="">   전환완료    </button>
+                    <button id="TxCancel" onclick="EE('txCancel')" disabled="">   전환취소    </button>
+                    <button id="TxToggle" onclick="EE('txToggle')" disabled="">   화자전환    </button>
+                    <button id="Tx3Connect" onclick="EE('tx3Connect')" disabled="">   3자통화     </button>
+                    <button id="Record" onclick="EE('record')" disabled="" class="icon-record">   부분녹취 시작</button>
+                    <br/>
+                    <button onclick="EE('getTeamAgents')" style="display:none" disabled="">  팀멤버   </button>
+                    <button onclick="EE('getGroupAgents')" style="display:none" disabled="">  그룹멤버 </button>
+                    <button onclick="EE('getCenterAgents')" style="display:none" disabled="">  전체멤버 </button>
+        
+        
+                    <button id="QueueAdd" onclick="EE('queueAdd')" style="display:none"> 큐로그인   </button>
+                    <button id="QueueSub" onclick="EE('queueSub')" style="display:none"> 큐로그아웃 </button>
+                    <button id="QueueRun" onclick="EE('queueRun')" style="display:none"> 큐활성화   </button>
+                    <button id="QueuePause" onclick="EE('queuePause')" style="display:none"> 큐비활성화 </button>
+                    <button id="QueueState" onclick="EE('queueState')" style="display:none"> 큐상태체크 </button>
+        
+                    <hr/>
+                    <button id="IvrSsn" onclick="EE('ivrSsn')" disabled=""> 주민번호받기 </button>
+                    <button id="IvrAcc" onclick="EE('ivrAccount')" disabled=""> 계좌번호받기 </button>
+                    <button id="IvrRet" onclick="EE('ivrReturn')" disabled=""> IVR전환취소  </button>
+                    <br/>
+        
+                    <div style="display:none">
+                        <input id="js2vb" size="100"/>  VB로 명령/메시지 전달<br/>
+                        <input id="vb2js" size="100" onchange="vbEvent()"/>  VB에서 메시지 받음<br/>
+                        <div id="custEv" style="display:none"></div>
+                    </div>
+        
+                    <div id="queue-DIV">
+                    </div>
+        
+                    
+
+
+
+        
+                </div>
+            </div>
+        
+        
+        
+        
+        
+        
+        </div>
+
+    </div>
+</body>
+
+        </html>
+</apex:page>

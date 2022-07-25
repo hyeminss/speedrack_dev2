@@ -1,0 +1,51 @@
+<template>
+    <lightning-card title="A/S 접수" icon-name="standard:account">
+        <div if:true={errorMsg} style="margin-left: 3%;">
+            <p style="color: red;">{errorMsg}</p>
+        </div>
+        <lightning-button label="Create AS" variant="brand" onclick={createAS} class="slds-m-bottom_x-small slds-p-horizontal_small slds-form-element"></lightning-button>                     
+        <lightning-layout multiple-rows="true" vertical-align="end">
+            <lightning-layout-item size="12" small-device-size="10" medium-device-size="8" large-device-size="6" padding="around-small">
+                    <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                    <lightning-input type="text" 
+                                                     label="수주번호를 입력하세요." 
+                                                     onchange={handleOrderNo} ></lightning-input>
+                            </div>
+                        </div> 
+            </lightning-layout-item>
+            <lightning-layout-item size="12" small-device-size="2" medium-device-size="2" large-device-size="2" padding="around-small">
+                    <lightning-button label="Search" 
+                                      variant="brand" 
+                                      onclick={handleSearch}></lightning-button>
+                </lightning-layout-item>
+            </lightning-layout><br/>
+        
+        <div if:true={searchSdata}>
+                <p>수주</p>
+                <lightning-datatable data={searchSdata} 
+                                 columns={columns1} 
+                                 key-field="Id"
+                                 onsave={handleSave}
+                                 draft-values={draftValues} 
+                                 hide-checkbox-column 
+                                 show-row-number-column
+                                 ></lightning-datatable>
+            </div>
+        </lightning-card>
+        <div if:true={searchData}>
+            <p>수주제품</p>
+            <lightning-datatable data={searchData} 
+                                     columns={columns} 
+                                     key-field="Id"
+                                     onsave={handleSave}
+                                     draft-values={draftValues} 
+                                     hide-checkbox-column 
+                                     show-row-number-column
+                                     ></lightning-datatable>
+            
+        </div>
+        <br/>
+        
+
+</template>

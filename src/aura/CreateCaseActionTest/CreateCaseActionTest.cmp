@@ -1,0 +1,6 @@
+<aura:component implements="force:lightningQuickAction" >
+    <aura:html tag="style"> .slds-modal__container { min-width: 90vw; } </aura:html>
+    <c:searchOrderBOM></c:searchOrderBOM>
+    <c:createASCustomLookupLwc></c:createASCustomLookupLwc>
+   
+</aura:component>

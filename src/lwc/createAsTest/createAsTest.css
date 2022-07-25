@@ -1,0 +1,7 @@
+/**
+ * Created by user on 2022-07-07.
+ */
+.slds-modal__container {
+    max-width: 80rem !important;
+    width: 80% !important;
+}

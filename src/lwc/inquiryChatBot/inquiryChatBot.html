@@ -1,0 +1,26 @@
+<!--
+ - Created by user on 2022-07-13.
+ -->
+
+<!-- Inquiry Chat Bot -->
+<template>
+    <lightning-card>
+        <lightning-record-form
+        object-api-name={objectApiName}
+        fields={fields}
+        onsuccess={handleSuccess}></lightning-record-form>
+    </lightning-card>
+</template>
+<!--<div class="slds-m-top_medium slds-m-bottom_x-large">
+    <div class="slds-p-around_medium lgc-bg">
+        <lightning-input type="text" name="name" label="이름" onchange={inputChange}></lightning-input>
+        <lightning-input type="text" name="phone" label="핸드폰번호" onchange={inputChange}></lightning-input>
+        <lightning-input type="text" name="email" label="메일" onchange={inputChange}></lightning-input>
+        <lightning-input-rich-text type="text" name="description" label="내용" onchange={inputChange}></lightning-input-rich-text>
+    </div>
+</div>
+<div>
+    <lightning-button-group>
+        <lightning-button variant="brand" label="문의하기" onclick={handleCreateCase}></lightning-button>
+    </lightning-button-group>
+</div>-->

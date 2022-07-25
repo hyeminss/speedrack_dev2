@@ -1,0 +1,7 @@
+<apex:page title="AdminPage" sidebar="false" showHeader="false" docType="html-5.0" id="thePage" lightningStylesheets="true" standardStylesheets="true"  >
+<html style="height: 100%; width:100%;">
+<body style="width: 100%; height: 100%;">
+<iframe id="admin" style="width: 100%; height: 100%;" src="https://sfcc02.matrixcloud.co.kr" ></iframe>
+</body>
+</html>
+</apex:page>

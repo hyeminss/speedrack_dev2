@@ -1,0 +1,142 @@
+<apex:page showHeader="true"   docType="html-5.0" lightningStylesheets="true" standardStylesheets="true" >
+  <apex:includeLightning />
+    <apex:includeScript value="{!URLFOR($Resource.clvs,'jquery.js')}"/>
+    <!-- <script type="text/javascript" src="/support/api/52.0/lightning/opencti_min.js"></script> -->
+    <apex:includeScript value="/support/api/52.0/lightning/opencti_min.js"/>
+    <apex:includeScript value="/support/console/52.0/integration.js"/>
+    
+    <head>
+
+    <script>
+
+        
+
+    function refreshPage(){
+      window.location.reload();
+      
+      // SFDC 화면도 새로고침
+      // window.top.location = '/';
+    }
+
+
+    function errModal(errMsg) {
+        
+        /* console.log('progressOn'); */
+    
+        var maskHeight = $(document).height();
+        var maskWidth  = window.document.body.clientWidth;
+        
+        
+        $('#mask').css({
+                'width' : maskWidth,
+                'height': maskHeight,
+                /* 'opacity' :'0.3', */
+                
+          });
+    
+          $('#errModal').css({
+              'margin-top' : maskHeight/2 - 150,
+              'display' : 'block'
+              /* 'opacity' :'0', */
+          });
+      
+        
+
+        $('.msgSpan').text(errMsg);
+
+        $('#mask').show();
+
+              
+        document.getElementById('lightning').remove;
+        
+
+        }
+
+        function pageReload(){
+          window.location.reload();
+        }
+    </script>
+    <style>
+      span{
+        color:black !important;
+        font-size: 12px;
+        font-family:Arial, Helvetica, sans-serif;
+      }
+      
+      .tHeader{
+        font-size: 12px;
+        font-weight: bolder;
+        text-align: left;
+        color: white !important;
+        padding: 3px;
+        display:block;
+      }
+      
+      .headerDiv{
+        width:100%;
+        height: 25px;
+        background: gray;
+      }
+      .msgDiv{
+        width:100%;
+        height: 50%;
+        text-align: center;
+        display: flex;
+        
+      }
+      
+      .msgSpan{
+        margin: auto;
+      }
+      .btnDiv{
+
+      }
+
+      .btn{
+        text-align: center;
+        vertical-align: middle;
+        justify-content: center;
+        transition: border .15s linear;
+        background: rgba(1, 118, 211, 1) !important;
+        border-color: rgba(1, 118, 211, 1) !important;
+        color: rgb(255, 255, 255) !important;
+        width:80px;
+        height: 30px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: #005fb2;
+        color: white;
+      }
+
+
+    </style>
+    </head>
+
+<body style="width:100vw; height: 100vh; overflow: hidden;">
+  <div id='mask' style='position:absolute; z-index:9000; background-color:#cccccc; display:none; left:0; top:0; text-align : center;'>
+    <div style='display: block; margin: 0px auto; width:200px; height:150px; background-color: white;' id="errModal">
+      <div class="headerDiv"><span class="tHeader">소프트폰 연결 에러</span></div>
+      
+      <div class="msgDiv">
+        
+        <span class="msgSpan">소프트폰에 다시 로그인하세요.</span>
+      </div>
+      <div class="btnDiv"><button class="btn" onclick="pageReload()">확인</button></div>
+    
+      
+        
+      
+    </div>
+    <!-- <img src="{!URLFOR($Resource.clvs,'img/Spinner.gif')}" style='display: block; margin: 0px auto; width:50px; height: 50px;' /> -->
+
+  </div>
+     <!-- <iframe id="lightning" border="none"  style="border:0;height:100vh; width:100vw; " src="testSoftphonPage"></iframe> -->
+
+     
+     <iframe id="lightning" border="none"  style="border:0; height:99vh; width:99vw; " scrolling="no" src="ctiLoginPage" ></iframe>
+   <!--   <iframe id="lightning" border="none"  style="border:0;height:100vh; width:100vw; " src="ctiMainPage"></iframe> -->
+     <!-- <iframe id="lightning" border="none"  style="border:0;height:100vh; width:100vw; " src="ctiSoftphonePage"></iframe> -->
+</body>
+
+</apex:page>

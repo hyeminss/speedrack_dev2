@@ -1,0 +1,21 @@
+<template>
+    <lightning-card title="AS 처리" icon-name="standard:case">
+        <div class="slds-p-horizontal_small">
+            <c-custom-lookup-lwc onselected={handleSelected}></c-custom-lookup-lwc>
+            <lightning-input label="AS접수마스터코드" name="master_num" value={master_num} onchange={handleChange} required="true" class="slds-m-bottom_x-small slds-p-horizontal_small slds-form-element"></lightning-input>
+            <lightning-input label="AS접수번호" name="as_order_num" value={as_order_num} onchange={handleChange} class="slds-m-bottom_x-small slds-p-horizontal_small slds-form-element"></lightning-input>   
+            <lightning-input label="AS접수일"  name="as_date" value={as_date} placeholder="ex) 2022-07-06" onchange={handleChange} class="slds-m-bottom_x-small slds-p-horizontal_small slds-form-element"></lightning-input>
+            <lightning-input label="수주번호"  name="selectedOrderNum" value={selectedOrderNum}  class="slds-hide" required="true"></lightning-input>   
+            <lightning-input label="소비자명"  name="receveName" value={receveName} onchange={handleChange} class="slds-m-bottom_x-small slds-p-horizontal_small slds-form-element"></lightning-input>   
+            <lightning-input label="소비자연락처"  name="recevePhone" value={recevePhone} onchange={handleChange} class="slds-m-bottom_x-small slds-p-horizontal_small slds-form-element"></lightning-input>   
+            <lightning-input label="출고주소"  name="receveAdress" value={receveAdress} onchange={handleChange} class="slds-m-bottom_x-small slds-p-horizontal_small slds-form-element"></lightning-input>   
+            <lightning-input label="클래임분류" name="claimtype" value={claimtype} onchange={handleChange} class="slds-m-bottom_x-small slds-p-horizontal_small slds-form-element"></lightning-input>               
+            <lightning-input label="제품분류"  name="bom_type" value={bom_type} onchange={handleChange} class="slds-m-bottom_x-small slds-p-horizontal_small slds-form-element"></lightning-input>   
+            <lightning-input label="유무상"  name="is_free" value={is_free} onchange={handleChange} class="slds-m-bottom_x-small slds-p-horizontal_small slds-form-element"></lightning-input> 
+            
+            <br/>
+ 
+            <lightning-button label="Create AS" variant="brand" onclick={createContact} class="slds-m-bottom_x-small slds-p-horizontal_small slds-form-element"></lightning-button>                     
+        </div>
+</lightning-card>
+</template>

@@ -1,0 +1,7 @@
+<!--
+ - Created by user on 2022-07-07.
+ -->
+
+<aura:component implements="force:lightningQuickAction" description="ASTEST">
+    <c:createAsTest ></c:createAsTest>
+</aura:component>

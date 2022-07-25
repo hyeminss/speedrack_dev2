@@ -1,0 +1,25 @@
+<!--
+ - Created by user on 2022-07-07.
+ -->
+
+<!-- Create As Test -->
+
+<template>
+
+    <lightning-input label="수주번호" name="orderNo"></lightning-input>
+    <lightning-button onclick={openModal}></lightning-button>
+
+    <template if:true={openmodal}>
+        <div class="slds-modal__container">
+                <lightning-input type="text" label="수주번호" name="orderNo" value={orderNo} onchange={handleChange} onkeypress={handleEnter}></lightning-input>
+        </div>
+    </template>
+
+<!--    <div style="height: 300px;">-->
+<!--        <lightning-datatable-->
+<!--                key-field="id"-->
+<!--                data={data}-->
+<!--                columns={columns}>-->
+<!--        </lightning-datatable>-->
+<!--    </div>-->
+</template>

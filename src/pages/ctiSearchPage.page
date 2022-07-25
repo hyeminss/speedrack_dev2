@@ -1,0 +1,2417 @@
+<apex:page controller="Ctr_CtiSearchPageController" lightningStyleSheets="true" standardStylesheets="true">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en"></html>
+    <apex:remoteObjects >
+        <!-- // 콜타입,콜ID,recURL,시작시간,종료시간,전화번호 -->
+        
+        
+            <apex:remoteObjectModel name="Account" fields="Id,Name,Phone"/>
+            <apex:remoteObjectModel name="Case" fields="Id,CaseNumber,Subject,X_CLVS_AccountName__c"/>
+            <apex:remoteObjectModel name="Opportunity" fields="Id,Name,AccountId,X_CLVS_AccountName__c"/>
+            <apex:remoteObjectModel name="Contact" fields="Id,Name,AccountId,X_CLVS_AccountName__c"/>
+            <apex:remoteObjectModel name="Lead" fields="Id,Name,Company"/>
+        
+       
+    </apex:remoteObjects>
+    <header>
+        <apex:slds />
+        
+        <script type='text/javascript' src='/canvas/sdk/js/43.0/publisher.js'/>
+        <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"/>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
+        <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/> -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+
+        <style>
+            body {
+                font-size: 12px !important;
+                font-family: sans-serif !important;
+                
+            }
+            .pbBody{
+                overflow: hidden;
+            }
+
+            #successToastDiv, #errorToastDiv, #popover {
+                display: none !important;
+            }
+
+            .container {
+                padding-right: 0 !important;
+                padding-left: 0 !important;
+                width:375px;
+                float: left;
+                /* width: 95vw; */
+               /*  width:99%;
+                float: left; */
+            }
+
+            .pbTitle {
+                width: 100% !important;
+            }
+
+            .pbTitle .mainTitle {
+                font-size: 13px;
+            }
+
+            .slds-card__body_inner, .slds-card__body--inner {
+                padding-right: 0 !important;
+                padding-left: 0 !important;
+                /* width: 100% !important; */
+            }
+
+            th {
+                text-align: center !important;
+            }
+
+            td {
+                width: 50px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+
+            .taskDiv {
+                display:block;
+                background: #fff;
+                width:375px;
+                height: 500px;
+                transition: all 600ms cubic-bezier(0.86, 0, 0.07, 1);
+                top: 100%;
+                position: fixed;
+                text-align: center;
+                /* z-index: 9999; */
+                
+            }
+
+            /* .taskDiv,  */.taskDivBottom{
+                display:block;
+                background: #fff;
+                width:375px;
+                position: relative;
+                
+            }
+
+            .container.taskDiv-open .taskDiv {
+                top: 0;
+            }
+            .container.leadDiv-open .leadDiv {
+                top: 0;
+            }
+            .container.contactDiv-open .contactDiv {
+                top: 0;
+            }
+
+            .taskInputDiv {
+                width:100%;
+                margin-left:auto;
+                margin-right: auto;
+                margin-top: 5px;
+                margin-bottom: 5px;
+                text-align: left;
+            }
+
+            .mainTitle{
+                font-size: 14px !important;
+            }
+
+            .selectList{
+                margin-left: 5px !important;
+                width: 80px;
+                text-align-last: center;
+                /* height: 32px !important; */
+            }
+
+            .selectList2{
+                margin-left: 5px !important;
+                width: 180px;
+            }
+
+            .what_search_div{
+                width: 205px;
+                display: inline-block;
+            }
+
+            .labelText{
+                width: 60px !important;
+                margin-right: 0;
+                display:block;
+            }
+
+            /* popover */
+            .popover {
+                top: 130px !important;
+                /* left: 379px !important; */
+            }
+
+            .popover-content {
+                padding: 10px;
+                height: auto;
+                width: 280px;
+            }
+
+            .popover-title {
+                margin: 0;
+                padding: 8px;
+                font-size: 14px;
+                font-weight: 400;
+                line-height: 20px;
+                background-color: #F7F7F7;
+                border-bottom: 1px solid #EBEBEB;
+                border-radius: 5px 5px 0 0;
+            }
+            .phoneNum_input{
+                width:180px !important;
+            }
+
+            .qaBtnDiv{
+                margin-top:10px;
+                
+            }
+
+            #messageDiv{
+                text-align: center !important;
+                width: 50%;
+                display: inline-block;
+                float: left;
+            }
+           
+            #innerQaBtnDiv{
+                width: 50%;
+                display: inline-block;
+                float: right;
+                text-align: right;
+            }
+
+            .sfdc_customBtn{
+                cursor: pointer;
+                border-radius: 0 !important;
+                margin-right: 2px;
+                
+            }
+            .sfdc_customBtn:hover{
+                opacity: 0.5;
+                
+            }
+
+
+            /*자동완성기능 스크롤 가능*/
+            .ui-autocomplete {
+                max-height: 200px !important;
+                overflow-y: auto !important;
+                /* prevent horizontal scrollbar */
+                overflow-x: hidden;
+            }
+
+
+
+            .custom-li{
+                padding:2px;
+                padding-left: 1px;
+                padding-right: 1px;
+                font-weight: normal;
+                color: black; 
+                border: none;
+            }
+            
+            .ui-widget-content .ui-state-active:hover {
+                border: 1px solid #c9c7c5 !important;
+                background: #c9c7c5 !important;
+                font-weight: normal;
+                color: black; 
+                
+            }
+            .ui-state-focus:hover{
+                border: 1px solid #c9c7c5 !important;
+                background: #c9c7c5 !important;
+            }
+
+            #option1{
+                
+                
+            }
+
+            .search_err_msg{
+                height: 10px;
+                border: 1px sold red;
+                color: red;
+            }
+            .search_err_msg_div{
+                height: 20px;
+                width: 100%;
+            }
+
+            #searchResultTable{
+                margin-bottom: 10px !important;
+            }
+            #searchResultTable tr td{
+                text-align: center !important;
+            }
+
+            .select2-container{
+                /* height: 32px !important; */
+                /* height: 100% !important; */
+            }
+
+            .select2-selection__rendered {
+                line-height: 31px !important;
+            }
+            .select2-container .select2-selection--single {
+                height: 31px !important;
+            }
+            .select2-selection__arrow {
+                height: 32px !important;
+            }
+
+            #who_type_parent{
+                vertical-align: top;
+            }
+            #what_type_parent{
+                vertical-align: top;
+            }
+
+            #getWhoBtn{
+                vertical-align: top;
+            }
+            
+            #getWhatBtn{
+                vertical-align: top;
+            }
+
+            .callResultSpan{
+                display:inline-block !important; 
+                width:50px !important;
+            }
+
+            #call_result_parent{
+                display: inline-block; 
+                position: absolute; 
+                top: 15px; 
+                right: 18px; 
+                text-align: left;
+            }
+            #call_result{
+                display:inline-block !important;
+            }
+
+            .custTypeSpan{
+                font-weight: bolder;
+            }
+
+        </style>
+
+      
+
+        <script type="text/javascript">
+            
+            $j = jQuery.noConflict();
+            var sforce = parent.parent.sforce;
+            
+
+            var selectId='';
+            var selectObjectType='';
+            var selectRecordName='';
+            var personAccount =false;
+
+            var whoFlag=true;
+            var whatFlag=true;
+
+
+            // CTI Function
+
+            var cCount = 0;
+
+            var onNavigationChange_listener = function(payload){
+
+                
+                console.log('Navigation change occurred. Payload: ', payload);
+                    
+                if( "recordId" in payload){
+                    
+                    // SFDC 화면의 레코드 ID/Type
+                    selectId = payload.recordId;
+                    selectObjectType = payload.objectType;
+                    selectRecordName = payload.recordName;
+
+                    /*
+                    2022-02-15 Chan추가 START
+                    개인계정 구분 작업
+                    */
+                    if(selectObjectType == 'Account' ){
+                        
+                        if("personAccount" in payload){
+                            personAccount = payload.personAccount;
+                        } else {
+                            personAccount = false;
+                        }
+                        
+                        
+                        // 개인계정의 경우 selectId 값을 AccountId 값이 아닌 개인계정 Account의 contactId 값으로 저장
+                        if(personAccount){
+                            selectId = payload.contactId;
+                        }
+
+                    } else {
+                        personAccount = false;
+                    }
+                    /*
+                    2022-02-15 Chan추가 END
+                    */
+
+                    //console.log(selectObjectType + ' //// ' + selectId + ' //// ' + selectRecordName  )
+                    }
+
+
+                   };
+  
+
+
+            // 전화번호 필드 클릭 이벤트
+            var listener = function(payload) {
+
+                // console.log("== onClickToDial - payload == \n" + JSON.stringify(payload));   
+                // console.log('Clicked phone number: ' + payload.number);
+                // Perform a third party webservice callout
+
+                // $("#tel").val(payload.number);
+                // parent.EE('dial');
+
+                var callState = $j("#state",parent.document).text();
+                
+            if(callState =="Idle"){
+                var num = payload.number;
+                parent.dial(num);
+
+                var beforeNumber = $j("[id$='phoneNumber']").val();
+
+                $j("[id$='phoneNumber']").val(num);
+                $j("[id$='searchBtn']").click();
+                /* if(beforeNumber != num){
+                    beforeNumber = num;
+                    $j("[id$='phoneNumber']").val(beforeNumber);
+                    $j("[id$='searchBtn']").click();
+                } */
+
+
+                /* 2022-02-23 
+                // 전화 걸기 (SFDC Click to dial  시 소프트폰 연결중 메시지가 바로 뜨도록 수정 */
+                $j("#sMsg",parent.document).text( '연결중 : ');
+                $j("#sNum",parent.document).text(num);
+                $j("#watchDisplay",parent.document).css("background-color","rgb(140 140 140)");
+                $j("#watchDisplay",parent.document).css("color","white");
+                $j("#statusSelect",parent.document).attr("disabled",true);
+                // 대기버튼 비활성
+                $j("#Stay",parent.document).attr("disabled",true);
+
+                $j("#Mute",parent.document).attr("disabled",false);
+                parent.watch_start();
+
+
+                /* 전화 걸기 (SFDC Click to dial  시 소프트폰 연결중 메시지가 바로 뜨도록 수정 END */
+
+
+
+                sforce.opencti.isSoftphonePanelVisible({callback: function (response) {
+
+                    if(response.success){
+                        // console.log('API method call executed successfully! returnValue: ' + JSON.stringify(response.returnValue));
+                        
+                        if(!response.returnValue.visible){
+                            sforce.opencti.setSoftphonePanelVisibility({ visible: true });
+                        }
+
+                    } else {
+                        // console.log('Something went wrong! Errors :  ' + JSON.stringify(response.errors));
+                        sforce.opencti.setSoftphonePanelVisibility({ visible: true });
+                    }
+                    }});
+
+
+            } else {
+                console.log("통화중 전화 불가능!");
+            }
+
+            }; 
+
+            var isVisible = false;
+            
+            window.addEventListener('load', function() {
+
+                // SFDC 전화번호 click to call 가능하도록 enable
+                sforce.opencti.enableClickToDial({callback: function () {}});
+                // SFDC 전화번호 click 으로 전화 걸기
+                sforce.opencti.onClickToDial({'listener': listener});
+                // 콘솔 탭 메뉴 change 
+                sforce.opencti.onNavigationChange({'listener': onNavigationChange_listener});
+                
+
+            var whoTypeParentElement = $j("#who_type_parent");
+                $j("#who_type").select2({
+                dropdownParent: whoTypeParentElement,
+                minimumResultsForSearch: Infinity
+                });
+                var whatTypeParentElement = $j("#what_type_parent");
+                $j("#what_type").select2({
+                dropdownParent: whatTypeParentElement,
+                minimumResultsForSearch: Infinity
+                });
+
+                var callResultParentElement = $j("#call_result_parent");
+                $j("#call_result").select2({
+                dropdownParent: callResultParentElement,
+                minimumResultsForSearch: Infinity
+                });
+
+                
+            });
+            // /// 전화번호 필드 클릭 이벤트 END
+
+
+            /*
+            _CS 수정
+            기존: 레코드 선택시 콜 로그 입력창
+            변경: SFDC 레코드 화면 이동
+            */
+            // 레코드 선택 시 (Task 등록 시) 
+            
+            function selectRecord(recordId, rName, rType,rIsPerson) {
+
+            
+            
+            // 콘솔창에 open
+            searchAndScreenPop(recordId, rName ,rType,rIsPerson);
+            }
+
+            /*
+                팝업창 컨트롤
+            */
+
+            function openTaskForm(){
+                taskDivOn();
+            }
+
+
+            // 화면 보이기용
+            function taskDivOn() {
+                
+                taskFormReset();
+                //$j("#taskCancelBtn").css("display","block");
+                //$j('.taskDiv').removeClass('taskDivBottom');
+                setTaskBottomForm('','',false);
+                $j('.mainDiv').css('display','none');
+                $j('.container').addClass('taskDiv-open');
+
+                if(selectObjectType =="Contact" || selectObjectType =="Lead" || (selectObjectType == "Account" && personAccount) ){
+                        getWhoRecordBtnClick();
+
+                    } else if((selectObjectType == "Account" && !personAccount) || selectObjectType == "Opportunity" ||selectObjectType == "Case"){
+                        
+                            getWhatRecordBtnClick();
+                        
+                        
+                    } else {
+                        /* 아무 유형 아님 */
+                        $j("#what_name").attr("disabled",true);
+                    }
+
+
+            }
+            function taskDivOff() {
+                var flag = confirm("취소 하시겠습니까?");
+
+                if(flag) {
+                    taskFormReset();
+                }
+            }
+            function taskDivHideFromButton(searchFlag){
+                
+                $j(".taskDiv").removeClass("taskDivBottom");
+                $j('.container').removeClass('taskDiv-open');
+                $j('.mainDiv').css('display','block');
+
+                if(!searchFlag){
+                 $j("[id$='phoneNumber']").val('');
+                }
+
+            }
+
+            function taskFormReset(){
+                $j('.container').removeClass('taskDiv-open');
+                    $j('.mainDiv').css('display','block');
+
+                    
+                    $j('#call_result').val("통화완료");
+                    $j("#call_result").trigger("change");
+
+                    $j('#what_type').val("none");
+                    $j("#what_type").trigger("change");
+                    $j('#what_id').val("");
+                    $j('#what_name').val("");
+                    $j('#what_name').attr("placeholder","");
+                    whatFlag = true;
+                    $j('#what_name').css("border-color","");
+                    $j('#what_name').attr("disabled",true);
+                    $j('#what_name_err').text("");
+
+                    $j('#who_type').val("none");
+                    $j("#who_type").trigger("change");
+                    $j('#who_id').val("");
+                    $j('#who_name').val("");
+                    $j('#who_name').attr("placeholder","");
+                    whatFlag = true;
+                    $j('#who_name').css("border-color","");
+                    $j('#who_name').attr("disabled",true);
+                    $j('#who_name_err').text("");
+
+                    $j("[id$=description]").val("");
+
+                   saveBtnDisabled(false);
+            }
+
+           
+
+            /*
+                Task 저장
+            */
+            function saveBtnDisabled(btnFlag){
+               // console.log('saveBtnDisabled('+btnFlag+');');
+                $j("#taskSubmitBtn").attr('disabled', btnFlag);
+            }
+
+            // Task 저장 버튼 클릭 시
+            function saveBtnClick() {
+             
+                saveBtnDisabled(true);
+                // (whoFlag&&whatFlag)
+
+                var whoId = $j('#who_id').val();
+                var whoName = $j('#who_name').val();
+                var whoType = $j("#who_type").val();
+                var whatId = $j('#what_id').val();
+                var whatName = $j('#what_name').val();
+                var whatType = $j("#what_type").val();
+                if(whoId !='' && whoFlag ){  // 성공
+                
+                    if(whatFlag || (!whatFlag && whatId =='' && whatName == '')){
+                        
+                        // 2022-02-15
+                        // what ID 값과 Name 이 같은지 확인 필요
+
+
+                        //alert("성공!!");
+                        var description = $j("[id$=description]").val();
+                        
+                        // console.log("whoId : " + whoId);
+                        // console.log("whatId : " + whatId);
+                        // console.log("description : " + description);
+                        var CALLINFO = parent.SFDC_CALLINFO;
+                        // console.log("CALLINFO = " + JSON.stringify(CALLINFO));
+                        CALLINFO.whoId = whoId;
+                        CALLINFO.whatId = whatId;
+
+
+                        var callType = CALLINFO.call_type;
+                        var callId = CALLINFO.uid;
+                        var recURL = '';
+                        
+                        var startTime = CALLINFO.start_time;
+                        var endtTime = CALLINFO.end_time;
+                        var callResult = $j('#call_result').val();
+                        
+
+                        // 상담이력 저장
+                        // 매개변수: whoId,whatId,description,callType,callId,recURL,startTime,endTime,통화결과,개인계정여부, who_name값, what_name값
+                        saveNewTask(whoId,whatId,description,callType,callId,recURL,startTime,endtTime,callResult, /* personAccount,  */ whoName,whatName);  
+                        
+                    }
+                
+                } else {
+
+                    if(whoId =='' ){
+                    
+                    $j("#who_name_err").text("고객정보를 입력하세요.");
+
+                     } else if(!whoFlag){ // who false
+                        $j("#who_name").focus();
+
+
+                    } else {    // what false
+                        $j("#what_name").focus();
+                  
+
+                }
+
+                saveBtnDisabled(false);
+                }
+
+            }
+
+        var param = {};
+        // After add new task 
+        function refreshView() {
+                sforce.opencti.refreshView(param);
+        }
+        var refresh_callback = function(response) {
+         if (response.success) {
+            //console.log('API method call executed successfully! returnValue:', response.returnValue);
+         } else { 
+            //console.error('Something went wrong! Errors:', response.errors);
+         }
+      	};
+            param.callback = refresh_callback;
+
+
+            // Task 저장 결과 check
+            function checkMakeTaskResult() {
+
+
+
+                var result = $j("[id$=checkResult]").val();
+                var errorMsg = $j("[id$=errorMsg]").val();
+                // console.log(result);
+                // console.log(errorMsg);
+
+                if(result == 'true') {
+                    // alert('상담이력이 저장되었습니다.');
+
+                    $j(".taskDiv").removeClass("taskDivBottom");
+                    $j('.container').removeClass('taskDiv-open');
+                    $j('.mainDiv').css('display','block');
+                
+                    
+                    $j("#sMsg_span").show();
+
+                    setTimeout(function() {
+                        $j("#sMsg_span").hide();
+                    }, 2000);
+
+                    
+                    var rId = $j("#who_id").val();
+
+                    sforce.opencti.screenPop({type: sforce.opencti.SCREENPOP_TYPE.SOBJECT, params:  {  recordId: rId}, callback: function(response) {
+                    if (response.success) {
+                        //console.log('API method call executed successfully! returnValue:', response.returnValue);
+                        refreshView();
+                        
+
+                    } else { 
+                        console.log('Something went wrong! Errors:', response.errors);
+                    }
+                }
+
+              });
+              
+
+                    taskFormReset();
+                    
+                    
+
+                    parent.SFDC_CALLINFO.clear();
+
+
+
+
+                } else {
+                    alert('상담이력 저장을 실패하였습니다.\n관리자에게 문의하세요.\n원인 : ' + errorMsg);
+                }
+
+               saveBtnDisabled(false);
+                
+            }
+  
+
+
+            function checkIdAndName(checkId, checkName, checkObjectType ){
+
+                var obj;
+                var clauses = {       
+                        'where': {
+                            'Id': { 'eq': checkId }
+                        }   
+                    };
+
+                if(checkObjectType == 'Contact'){
+                     obj = new SObjectModel.Contact();
+
+
+                } else if (checkObjectType == 'Lead'){
+                    obj = new SObjectModel.Lead();
+
+                } else if (checkObjectType == 'Account'){
+                    obj = new SObjectModel.Account();
+
+                } else if (checkObjectType == 'Opportunity'){
+                    obj = new SObjectModel.Opportunity();
+
+                } else if (checkObjectType == 'Case'){
+                    obj = new SObjectModel.Case();
+
+                } else {
+
+
+                }
+                
+
+            
+                    obj.retrieve(clauses, function(err, records, event) {
+                  
+                
+                            if (err) {
+                                console.log(JSON.stringify(err));
+                                alert(err);
+                                
+                            } else {
+                               
+                               console.log('records.length =========> ' + records.length); 
+                               console.log('records =========> ' +  JSON.stringify(records)); 
+                               
+                                
+                            }
+                        });
+
+
+            }
+
+
+            /*
+            _CS 추가
+            고객정보 자동완성
+            */
+
+            function setWhatIdAndName( wId, wName){
+
+                if(wId != '' && wName != ''){
+                $j("#whatIdSearchBox").removeClass('slds-is-open');    
+                $j("#whatIdSearchResult").children().remove();
+                $j("#what_id").val(wId);
+                $j("#what_name").val(wName);
+                } else {
+                    searchBoxBlur_what();
+                }
+
+            }
+
+            function setWhoIdAndName(wId,wName){
+
+                if(wId != '' && wName != ''){
+                $j("#whoIdSearchBox").removeClass('slds-is-open');    
+                $j("#whoIdSearchResult").children().remove();
+                $j("#who_id").val(wId);
+                $j("#who_name").val(wName);
+                }else {
+                    searchBoxBlur_who();
+                }
+
+            }
+
+
+            // 포커스 아웃 
+            function searchBoxBlur_who(){
+                
+                $j("#whoIdSearchBox").removeClass('slds-is-open');    
+                $j("#whoIdSearchResult").children().remove();
+                
+            }
+
+            function searchBoxBlur_what(){
+                $j("#whatIdSearchBox").removeClass('slds-is-open');    
+                $j("#whatIdSearchResult").children().remove();
+                
+            }
+
+
+            /*
+                Contact 저장
+            */
+            // 계정 검색 자동완성
+            function accountAutoComplete() {
+                var selectedId = null;
+
+                $j('input[id$=what_name]').autocomplete({
+                    minLength: 1,
+                    delay: 300,
+                    source: function(request, response) {
+
+                        
+                        var accountRO = new SObjectModel.Account();
+                        accountRO.retrieve({where: {Name: {like: '%' + request.term + '%' }}}, function(err, records, event) {
+                            if (err) {
+                                alert(err);
+                            } else {
+                                var result = [];
+                                records.forEach(function(record) {
+                                    
+                                result.push({
+                                        label: record.get('Name'),
+                                        value: record.get('Name'),
+                                        Id : record.get('Id'),
+                                    });
+                                });
+                                response(result);
+                            }
+                        });
+                    },
+                    select: function(event, ui) {        
+                        event.preventDefault();
+
+                        $j('input[id$=what_name]').val(ui.item.label);
+                        $j('input[id$=what_id]').val(ui.item.Id);
+                        // selectedId = ui.item.value;
+                    },
+                  
+                });
+            }
+         
+
+            var callback3 = function(response) {
+                if (response.success) {
+                    // console.log('API method call executed successfully! returnValue:', response.returnValue);
+                } else { 
+                     console.log('Something went wrong! Errors:', response.errors);
+                     console.log(JSON.stringify(response));
+                }
+            };
+            // // console 창에 레코드 정보 띄우기
+            function searchAndScreenPop(rId,rName,rType,rIsPerson) {
+            
+                sforce.opencti.screenPop({type: sforce.opencti.SCREENPOP_TYPE.SOBJECT, params:  {  recordId: rId}, 'callback': function (response){ 
+
+                    if (response.success) {
+                        /* console.log('RESPONSE >> \n ' + JSON.stringify(response));
+                         */ 
+                        console.log('API method call executed successfully! returnValue:', response.returnValue);
+                        
+                        if(rType != null && rType != 'undefined' && rType != ''){
+                        
+                        selectId = rId;
+                        selectRecordName = rName;
+                        selectObjectType = rType;
+                        personAccount = rIsPerson;
+
+                        setTaskBottomForm(true);
+
+                        }
+
+
+                    } else { 
+                        console.log('Something went wrong! Errors:', response.errors);
+                    }
+
+                }
+
+            });
+            
+            
+            }
+                
+            
+
+            
+
+            function setTaskBottomForm(flag){
+
+                if(flag){
+                    
+                    $j(".taskDiv").addClass("taskDivBottom");
+                    $j("#taskCancelBtn").css("display","none");
+
+                    // console.log('setTaskBottomForm ==');
+                    if(selectObjectType =="Contact" || selectObjectType =="Lead" || (selectObjectType == "Account" && personAccount)){
+                       // console.log('selectObjectType =="Contact" || selectObjectType =="Lead" || (selectObjectType == "Account" && personAccount ==');
+                        getWhoRecordBtnClick();
+
+                    } else{
+
+                        if($j("#who_type").val() != "Lead"){
+                        getWhatRecordBtnClick();
+                        }
+
+                    }
+
+
+                } else {
+                    
+                    $j(".taskDiv").removeClass("taskDivBottom");
+                    $j("#taskCancelBtn").css("display","inline-block");
+                }
+
+
+
+            }
+
+            // console 창에 리스트뷰 정보 띄우기_BG
+         /*    function searchAndScreenPopList(){
+                sforce.opencti.screenPop({type: sforce.opencti.SCREENPOP_TYPE.LIST, params: {listViewId: '00B5g00000MODyJEAX'	, scope: 'Task'}, callback: callback3});
+            } */
+
+            // 소프트폰 전화번호 클릭 이벤트
+            function makeCallByPhoneNum(rId,num,type){
+            // alert("rId : " + rId +"\nnum: " +num);
+            var callState = $j("#state",parent.document).text();
+            if(callState =="Idle"){
+            searchAndScreenPop(rId);
+            selectRecord(rId);
+            parent.dial(num);
+            } else {
+                console.log("통화중..... 전화 불가");
+
+                selectRecord(rId,'',type);
+            }
+
+            }
+            
+            /*
+            _CS 수정
+            전화/핸드폰 정규식 검사
+            Lead Contact 등록
+
+            */
+
+            function isMobilePhone(p) {
+                p = p.split('-').join('');
+                var regPhone = /^((01[1|6|7|8|9])[1-9]+[0-9]{6,7})|(010[1-9][0-9]{7})$/;
+                return regPhone.test(p);
+            }
+
+
+            // Account 등록
+            function openNewAccountPage_NewRecordModal(){
+                var phoneNumber = $j("[id$='phoneNumber']").val();
+                var defaultFieldValues = {};
+                var fieldName = '';
+                var mobilePhone = '';
+                var phone='';
+
+                // defaultFieldValues.RecordTypeId = '0125j000000ZBTSAA4';
+                
+                // NEW_RECORD_MODAL 
+                /* sforce.opencti.screenPop({type: sforce.opencti.SCREENPOP_TYPE.NEW_RECORD_MODAL, params:  {  entityName: "Account", 
+                    defaultFieldValues
+                }, callback: callback3  }); */
+                 
+                if(isMobilePhone(phoneNumber)){
+                    defaultFieldValues.PersonMobilePhone = phoneNumber;
+                    defaultFieldValues.Phone = phoneNumber;
+                } else {
+                    defaultFieldValues.Phone = phoneNumber;
+                    defaultFieldValues.PersonHomePhone = phoneNumber;
+                }
+                sforce.opencti.screenPop({type: sforce.opencti.SCREENPOP_TYPE.NEW_RECORD_MODAL, params:  {  entityName: "Account", 
+                    defaultFieldValues
+                }, callback: callback3  });
+            }
+
+
+
+            function openNewAccountPage_Flow(){
+                var phoneNumber = $j("[id$='phoneNumber']").val();
+                var fieldName = '';
+                
+                if(isMobilePhone(phoneNumber)){
+                    fieldName = 'mobilePhoneNum';
+                    
+                } else {
+                    fieldName = 'PhoneNum';
+                    
+                }
+               
+                /* // FLOW          
+                    플로의 경우 화면이 예쁘게 나오지 않는 단점, 큰 콘솔 화면에 가득차서 화면이 나오고
+                    footer에 포함되어있는 저장(마침) 버튼이 가장 우측에 위치함
+                */
+                //  params: {flowDevName: 'ScreenDemo', flowArgs: [{ 'activityDate': date, 'duration': duration, 'subject': subject }]}
+                sforce.opencti.screenPop({type: sforce.opencti.SCREENPOP_TYPE.FLOW, 
+                        params: {
+                            flowDevName: 'Person_Account_Quick_Make', 
+                        flowArgs: [{'name' : fieldName, 'type' : 'String', 'value' : phoneNumber}]
+                        } , 
+                        callback: callback3  });
+                
+
+            }
+
+            function openNewAccountPage_VF(){
+                var phoneNumber = $j("[id$='phoneNumber']").val();
+                var mobilePhone = '';
+                var phone='';
+                //
+                
+                if(isMobilePhone(phoneNumber)){
+                    mobilePhone = phoneNumber;
+                } else {
+                    phone = phoneNumber;
+                }
+               
+                 var vfURL = '/apex/quickPersonAccountCreate?mobilePhone=' + mobilePhone +'&phone='+phone;
+
+                 sforce.opencti.screenPop({type: sforce.opencti.SCREENPOP_TYPE.URL,params : { url: vfURL }, callback: callback3  });
+                
+
+                  
+                 /* 
+                 // component           https://curious-narwhal-3d8w7a-dev-ed.lightning.force.com/lightning/n/quickPersonAccount?
+                 // component를 바로 연결할 경우 parameter 전달 실패로 인하여, VF 개발로 진행 
+                 */
+                 
+                 // var componentUrl = 'https://curious-narwhal-3d8w7a-dev-ed.lightning.force.com/lightning/n/quickPersonAccount?mobilePhone=' + mobilePhone +'&phone='+phone;
+                 //var componentUrl = '/lightning/n/quickPersonAccount?mobilePhone=' + mobilePhone +'&phone='+phone;
+               
+                 //sforce.opencti.screenPop({type: sforce.opencti.SCREENPOP_TYPE.URL,params : { url: componentUrl }, callback: callback3  });
+
+
+            }
+
+
+
+            // Lead 등록 
+            function openNewLeadPage(){
+                var phoneNumber = $j("[id$='phoneNumber']").val();
+                var defaultFieldValues = {};
+                
+                if(isMobilePhone(phoneNumber)){
+                    defaultFieldValues.MobilePhone = phoneNumber;
+                } else {
+                    defaultFieldValues.Phone = phoneNumber;
+                }
+                
+                sforce.opencti.screenPop({type: sforce.opencti.SCREENPOP_TYPE.NEW_RECORD_MODAL, params:  {  entityName: "Lead", 
+                    defaultFieldValues
+                }, callback: callback3  });
+
+            }
+
+              // Contact 등록 
+              function openNewContactPage(){
+                var phoneNumber = $j("[id$='phoneNumber']").val();
+                var defaultFieldValues = {};
+                
+                if(isMobilePhone(phoneNumber)){
+                    defaultFieldValues.MobilePhone = phoneNumber;
+                } else {
+                    defaultFieldValues.Phone = phoneNumber;
+                }
+                sforce.opencti.screenPop({type: sforce.opencti.SCREENPOP_TYPE.NEW_RECORD_MODAL, params:  {  entityName: "Contact", 
+                    defaultFieldValues
+                }, callback: callback3  });
+
+            }
+
+
+            // Case 등록 
+            function openNewCasePage(){
+                
+                var phoneNumber = $j("[id$='phoneNumber']").val();
+                
+                sforce.opencti.screenPop({type: sforce.opencti.SCREENPOP_TYPE.NEW_RECORD_MODAL, params:  {  entityName: "Case", 
+                    defaultFieldValues:{Subject : '',  Contact :'', SuppliedPhone :phoneNumber }
+                }, callback: callback3  });
+
+            }
+
+
+            // _CS 추가
+            // 고객정보 선택목록 이벤트
+            function changePlaceholder_who(tv){
+
+                var phWho = "";
+                var phStr = "입력하세요.";
+
+                // console.log('value = ' + tv);
+                $j("#who_name").val("");
+                $j("#who_id").val("");
+                $j("#who_name").css("border-color","");
+                $j("#who_name_err").text("");
+                whoFlag=true;
+
+                if(tv =="none"){
+                    phStr = "";
+                    $j("#who_name").attr("disabled",true);
+                    $j("#what_type").attr("disabled",false);
+                    $j("#what_name").attr("disabled",false);
+                    $j("#getWhatBtn").attr("disabled",false);
+
+                } else if(tv == "Contact"){
+                    phWho = "이름을 ";
+                    $j("#who_name").attr("disabled",false);
+                    $j("#what_type").attr("disabled",false);
+
+                    if( $j("#what_type").val() == "none"){
+                        $j("#what_name").attr("disabled",true);
+                    } else {
+                        $j("#what_name").attr("disabled",false);
+                    }
+
+                    $j("#getWhatBtn").attr("disabled",false);
+                } else if(tv == "Lead"){
+                    phWho = "이름을 ";
+                    $j("#who_name").attr("disabled",false);
+
+                    $j("#what_type").attr("disabled",true);
+                    $j("#what_type").val("none");
+                    $j("#getWhatBtn").attr("disabled",true);
+                    $j("#what_type").trigger("change");
+                    changePlaceholder_what("none");
+
+                    /* $j("#what_name").attr("disabled",true);
+                    $j("#what_name").attr("disabled",true); */
+
+                } else {
+                    console.log("changePlaceholder_who is wrong !!");
+                    phWho="";
+                    $j("#who_name").attr("disabled",false);
+                }
+
+                $j("#who_name").attr("placeholder",phWho + phStr);
+
+                }
+
+                 // _CS 추가
+                 // 고객정보 자동완성
+                function autoComplete_who(){
+
+                    var whoIdType = $j("#who_type").val();
+                    var whoNameVal = $j("#who_name").val();
+                    var sObject; 
+                    
+                    if(whoIdType == "Contact"){
+
+                        
+                    $j('input[id$=who_name]').autocomplete({
+                        minLength: 1,
+                        delay: 300,
+                        source: function(request, response) {
+                            var sObject = new SObjectModel.Contact();
+                            sObject.retrieve({where: {Name: {like: '%' + request.term + '%' }}}, function(err, records, event) {
+                                if (err) {
+                                    alert(err);
+                                } else {
+                                    var result = [];
+                                    records.forEach(function(record) {
+
+                                        var beforeName = record.get('Name');
+                                        var afterName = decodeHTMLEntities(beforeName);
+
+                                        result.push({
+                                            name: record.get('Name'),
+                                            value: afterName,
+                                            Id : record.get('Id'),
+                                            acctName : record.get('X_CLVS_AccountName__c')
+                                        });
+
+                                        /* if(record.get('IsPersonAccount')){
+                                            
+                                            result.push({
+                                            name: record.get('Name'),
+                                            value: afterName,
+                                            Id : record.get('Id'),
+                                            acctName : record.get('X_CLVS_PersonAccount_Branch_Office_Name__c')
+                                            });
+                                        } else {
+                                            
+                                            result.push({
+                                            name: record.get('Name'),
+                                            value: afterName,
+                                            Id : record.get('Id'),
+                                            acctName : record.get('X_CLVS_AccountName__c')
+                                        });
+                                         } */
+
+
+                                    });
+                                    response(result);
+                                }
+                            });
+                        },
+                        select: function(event, ui) {        
+                            event.preventDefault();
+
+                            $j('input[id$=who_name]').val(ui.item.value);
+                            $j('input[id$=who_id]').val(ui.item.Id);
+                            // selectedId = ui.item.value;
+
+                            
+                            $j('input[id$=who_name]').css("border-color","");
+                            $j('#who_name_err').text("");
+                            whoFlag=true;
+                        },
+                       
+                    }).autocomplete("instance")._renderItem = function(ul, item) {
+                            ul.attr({
+                                "class" : "auto-ul list-group ui-autocomplete ui-front ui-menu ui-widget ui-widget-content ui-state-active slds-listbox slds-listbox_vertical" //auto-ul list-group
+                                
+                            });
+                            
+                            var list = $j("<div>");
+                           
+                            var strHtml ='';
+                                        strHtml += '<div id="option1" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option" >';
+                                        strHtml += '<span class="slds-media__figure slds-listbox__option-icon"><span class="slds-icon_container slds-icon-standard-contact">';
+                                        strHtml += '<svg class="slds-icon slds-icon_small" aria-hidden="true">';
+                                        strHtml += '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS,'/assets/icons/standard-sprite/svg/symbols.svg#contact')}"></use>';
+                                        strHtml += '</svg></span></span>';
+                                        strHtml += '<span class="slds-media__body">';
+                                        strHtml += '<span class="slds-listbox__option-text slds-listbox__option-text_entity">';
+                                        strHtml += item.name + '</span>';
+                                        strHtml += '<span class="slds-listbox__option-meta slds-listbox__option-meta_entity" style="font-size:10px !important;">'+item.acctName+'</span>';
+                                        strHtml += '</span></div>';
+
+                            
+                            
+                            
+                            return $j("<li>").attr({
+                                "class" : "auto-list list-group-item custom-li" //auto-list list-group-item
+                                ,"style" : "width: 205px"                            
+                            }).append(strHtml)    //.append(list.append(img).append(info.append(contactName)))
+                            .appendTo(ul);
+                        };
+
+                    } else if(whoIdType == "Lead"){
+
+
+                        
+                    $j('input[id$=who_name]').autocomplete({
+                        minLength: 1,
+                        delay: 300,
+                        source: function(request, response) {
+                            var sObject = new SObjectModel.Lead();
+                            sObject.retrieve({where: {Name: {like: '%' + request.term + '%' }}}, function(err, records, event) {
+                                if (err) {
+                                    alert(err);
+                                } else {
+                                    var result = [];
+                                    records.forEach(function(record) {
+                                    
+                                    var beforeName = record.get('Name');
+                                    var afterName = decodeHTMLEntities(beforeName);
+                                    
+                                    result.push({
+                                            name: record.get('Name'),
+                                            company: record.get('Company'),
+                                            value: afterName,
+                                            Id : record.get('Id'),
+                                        });
+                                    });
+                                    response(result);
+                                }
+                            });
+                        },
+                        select: function(event, ui) {        
+                            event.preventDefault();
+
+                            $j('input[id$=who_name]').val(ui.item.value);
+                            $j('input[id$=who_id]').val(ui.item.Id);
+                            // selectedId = ui.item.value;
+                            whoFlag=true;
+
+                            $j('input[id$=who_name]').css("border-color","");
+                            $j('#who_name_err').text("");
+                        },
+                        
+                        
+                    }).autocomplete("instance")._renderItem = function(ul, item) {
+                            ul.attr({
+                                "class" : "auto-ul list-group ui-autocomplete ui-front ui-menu ui-widget ui-widget-content ui-state-active slds-listbox slds-listbox_vertical" //auto-ul list-group
+                                
+                            });
+                            
+                            var list = $j("<div>");
+                           
+                            var strHtml ='';
+                                        strHtml += '<div id="option1" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">';
+                                        strHtml += '<span class="slds-media__figure slds-listbox__option-icon"><span class="slds-icon_container slds-icon-standard-lead">';
+                                        strHtml += '<svg class="slds-icon slds-icon_small" aria-hidden="true">';
+                                        strHtml += '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS,'/assets/icons/standard-sprite/svg/symbols.svg#lead')}"></use>';
+                                        strHtml += '</svg></span></span>';
+                                        strHtml += '<span class="slds-media__body">';
+                                        strHtml += '<span class="slds-listbox__option-text slds-listbox__option-text_entity">';
+                                        strHtml += item.name + '</span>';
+                                        strHtml += '<span class="slds-listbox__option-meta slds-listbox__option-meta_entity" style="font-size:10px !important; ">'+item.company+'</span>';
+                                        strHtml += '</span></div>';
+
+                            
+                            
+                            
+                            return $j("<li>").attr({
+                                "class" : "auto-list list-group-item custom-li" //auto-list list-group-item
+                                ,"style" : "width: 205px"                            
+                            }).append(strHtml)    //.append(list.append(img).append(info.append(contactName)))
+                            .appendTo(ul);
+                        };
+
+
+                    }
+
+
+
+
+                }
+
+
+            // 관련항목 선택목록 이벤트
+            function changePlaceholder_what(tv){
+
+                var phWhat = "";
+                var phStr = "입력하세요.";
+
+                //console.log('value = ' + tv);
+                $j("#what_name").val("");
+                $j("#what_id").val("");
+                $j("#what_name").css("border-color","");
+                $j("#what_name_err").text("");
+                whatFlag=true;
+
+                
+
+                if(tv =="none"){
+                    phStr = "";
+                    $j("#what_name").attr("disabled",true);
+
+                } else if(tv == "Account"){
+                    phWhat = "이름을 ";
+                    $j("#what_name").attr("disabled",false);
+                } else if(tv == "Case"){
+                    phWhat = "사례번호를 ";
+                    $j("#what_name").attr("disabled",false);
+
+                } else if(tv == "Opportunity"){
+                    phWhat = "이름을 ";
+                    $j("#what_name").attr("disabled",false);
+                } else {
+                    console.log("changePlaceholder_what is wrong !!");
+                    phWhat="";
+                    $j("#what_name").attr("disabled",false);
+                }
+
+                $j("#what_name").attr("placeholder",phWhat + phStr);
+
+            }
+
+
+
+        // _CS 추가
+        // 관련 자동완성
+        function autoComplete_what(){
+
+            var whatIdType = $j("#what_type").val();
+            var whatNameVal = $j("#what_name").val();
+            var sObject; 
+
+
+            if(whatIdType == "Account"){
+
+                
+            $j('input[id$=what_name]').autocomplete({
+                minLength: 1,
+                delay: 300,
+                source: function(request, response) {
+                    var sObject = new SObjectModel.Account();
+
+                    var clauses = {where: {Name: {like: '%' + request.term + '%' }}};
+                    /* var clauses = {where: {Name: {like: '%' + request.term + '%' },
+                                                IsPersonAccount: {eq : false}}}; */
+                    /*
+                    {where: {Name: {like: '%' + request.term + '%' },
+                                                IsPersonAccount: {eq : false}}}
+                    */
+
+                    sObject.retrieve(clauses, function(err, records, event) {
+                        if (err) {
+                            alert(err);
+                        } else {
+                            var result = [];
+                            records.forEach(function(record) {
+                                // console.log('record  >>>>>>>>>>> \n' + JSON.stringify(record));
+                                
+                                var beforeName = record.get('Name');
+                                var afterName = decodeHTMLEntities(beforeName);
+                                
+                            result.push({
+                                    name: record.get('Name'),
+                                    value: afterName,
+                                    Id : record.get('Id'),
+                                });
+                            });
+                            response(result);
+                            console.log('result>>>>>>>>>>> \n' + JSON.stringify(result));
+                        }
+                    });
+                },
+                select: function(event, ui) {        
+                    event.preventDefault();
+                    
+                    $j('input[id$=what_name]').val(ui.item.value);
+                    $j('input[id$=what_id]').val(ui.item.Id);
+
+                    $j('input[id$=what_name]').css("border-color","");
+                    $j('#what_name_err').text("");
+                    // selectedId = ui.item.value;
+                    whatFlag=true;
+                },
+                               
+
+            }).autocomplete("instance")._renderItem = function(ul, item) {
+                    ul.attr({
+                        "class" : "auto-ul list-group ui-autocomplete ui-front ui-menu ui-widget ui-widget-content ui-state-active slds-listbox slds-listbox_vertical" //auto-ul list-group
+                        
+                    });
+                    
+                    var list = $j("<div>");
+                
+                    var strHtml ='';
+                                strHtml += '<div id="option1" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">';
+                                strHtml += '<span class="slds-media__figure slds-listbox__option-icon"><span class="slds-icon_container slds-icon-standard-account">';
+                                strHtml += '<svg class="slds-icon slds-icon_small" aria-hidden="true">';
+                                strHtml += '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS,'/assets/icons/standard-sprite/svg/symbols.svg#account')}"></use>';
+                                strHtml += '</svg></span></span>';
+                                strHtml += '<span class="slds-media__body">';
+                                strHtml += '<span class="slds-listbox__option-text slds-listbox__option-text_entity">';
+                                strHtml += item.name + '</span>';
+                                /* strHtml += '<span class="slds-listbox__option-meta slds-listbox__option-meta_entity">'+rAcctName+'</span>'; */
+                                strHtml += '</span></div>';
+
+                    
+                    
+                    
+                    return $j("<li>").attr({
+                        "class" : "auto-list list-group-item custom-li" //auto-list list-group-item
+                        ,"style" : "width: 205px"                            
+                    }).append(strHtml)    //.append(list.append(img).append(info.append(contactName)))
+                    .appendTo(ul);
+                };
+
+            } else if(whatIdType == "Case"){
+
+
+                
+            $j('input[id$=what_name]').autocomplete({
+                minLength: 1,
+                delay: 300,
+                source: function(request, response) {
+                    var sObject = new SObjectModel.Case();
+                    sObject.retrieve({where: {CaseNumber: {like: '%' + request.term + '%' }}}, function(err, records, event) {
+                        if (err) {
+                            alert(err);
+                        } else {
+                            var result = [];
+                            records.forEach(function(record) {
+                                
+                            result.push({
+                                    caseNumber: record.get('CaseNumber'),
+                                    subject: record.get('Subject'),
+                                    value: record.get('CaseNumber'),
+                                    Id : record.get('Id'),
+                                    acctName : record.get('X_CLVS_AccountName__c')
+                                });
+                            });
+                            response(result);
+                        }
+                    });
+                },
+                select: function(event, ui) {        
+                    event.preventDefault();
+
+                    $j('input[id$=what_name]').val(ui.item.caseNumber);
+                    $j('input[id$=what_id]').val(ui.item.Id);
+                    // selectedId = ui.item.value;
+                    $j('input[id$=what_name]').css("border-color","");
+                    $j('#what_name_err').text("");
+                    whatFlag=true;
+                },
+                
+            }).autocomplete("instance")._renderItem = function(ul, item) {
+                    ul.attr({
+                        "class" : "auto-ul list-group ui-autocomplete ui-front ui-menu ui-widget ui-widget-content ui-state-active slds-listbox slds-listbox_vertical" //auto-ul list-group
+                        
+                    });
+                    
+                    var list = $j("<div>");
+                    var subject, accountName;
+
+                    if(item.subject != null && item.subject != '' && item.subject != 'undefined'){
+                        subject = item.subject;
+                    } else {
+                        subject = '';
+                    }
+                    if(item.acctName != null && item.acctName != '' && item.acctName != 'undefined'){
+                        accountName = item.acctName;
+                    } else {
+                        accountName = '';
+                    }
+                    
+
+                    var strHtml ='';
+                                strHtml += '<div id="option1" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">';
+                                strHtml += '<span class="slds-media__figure slds-listbox__option-icon"><span class="slds-icon_container slds-icon-standard-case">';
+                                strHtml += '<svg class="slds-icon slds-icon_small" aria-hidden="true">';
+                                strHtml += '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS,'/assets/icons/standard-sprite/svg/symbols.svg#case')}"></use>';
+                                strHtml += '</svg></span></span>';
+                                strHtml += '<span class="slds-media__body">';
+                                strHtml += '<span class="slds-listbox__option-text slds-listbox__option-text_entity">';
+                                strHtml += '['+item.caseNumber +']'+subject+ '</span>';
+                                strHtml += '<span class="slds-listbox__option-meta slds-listbox__option-meta_entity"  style="font-size:10px !important; ">'+accountName+'</span>';
+                                strHtml += '</span></div>';
+
+                    
+                    
+                    
+                    return $j("<li>").attr({
+                        "class" : "auto-list list-group-item custom-li" //auto-list list-group-item
+                        ,"style" : "width: 205px"                            
+                    }).append(strHtml)    //.append(list.append(img).append(info.append(contactName)))
+                    .appendTo(ul);
+                };
+
+
+            } else if(whatIdType == "Opportunity"){
+
+                                
+                $j('input[id$=what_name]').autocomplete({
+                    minLength: 1,
+                    delay: 300,
+                    source: function(request, response) {
+                        var sObject = new SObjectModel.Opportunity();
+                        sObject.retrieve({where: {Name: {like: '%' + request.term + '%' }}}, function(err, records, event) {
+                            if (err) {
+                                alert(err);
+                            } else {
+                                var result = [];
+                                records.forEach(function(record) {
+
+                                    var beforeName = record.get('Name');
+                                    var afterName = decodeHTMLEntities(beforeName);
+
+                                result.push({
+                                        name: record.get('Name'),
+                                        value: afterName,
+                                        Id : record.get('Id'),
+                                        acctName : record.get('X_CLVS_AccountName__c')
+                                    });
+                                });
+                                response(result);
+                            }
+                        });
+                    },
+                    select: function(event, ui) {        
+                        event.preventDefault();
+
+                        $j('input[id$=what_name]').val(ui.item.value);
+                        $j('input[id$=what_id]').val(ui.item.Id);
+                        $j('input[id$=what_name]').css("border-color","");
+                        $j('#what_name_err').text("");
+                        // selectedId = ui.item.value;
+                        whatFlag=true;
+                    },
+                    
+                }).autocomplete("instance")._renderItem = function(ul, item) {
+                        ul.attr({
+                            "class" : "auto-ul list-group ui-autocomplete ui-front ui-menu ui-widget ui-widget-content ui-state-active slds-listbox slds-listbox_vertical" //auto-ul list-group
+                            
+                        });
+                        
+                        var list = $j("<div>");
+                    
+                        var strHtml ='';
+                                    strHtml += '<div id="option1" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">';
+                                    strHtml += '<span class="slds-media__figure slds-listbox__option-icon"><span class="slds-icon_container slds-icon-standard-opportunity">';
+                                    strHtml += '<svg class="slds-icon slds-icon_small" aria-hidden="true">';
+                                    strHtml += '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS,'/assets/icons/standard-sprite/svg/symbols.svg#opportunity')}"></use>';
+                                    strHtml += '</svg></span></span>';
+                                    strHtml += '<span class="slds-media__body">';
+                                    strHtml += '<span class="slds-listbox__option-text slds-listbox__option-text_entity">';
+                                    strHtml += item.name + '</span>';
+                                    strHtml += '<span class="slds-listbox__option-meta slds-listbox__option-meta_entity" style="font-size:10px !important; ">'+item.acctName+'</span>';
+                                    strHtml += '</span></div>';
+
+                        
+                        
+                        
+                        return $j("<li>").attr({
+                            "class" : "auto-list list-group-item custom-li" //auto-list list-group-item
+                            ,"style" : "width: 205px"                            
+                        }).append(strHtml)    //.append(list.append(img).append(info.append(contactName)))
+                        .appendTo(ul);
+                    };
+
+                } 
+
+        }
+
+        
+        /*
+        _CS 추가
+        who_name input blur 
+        */
+        function check_who_name(){
+            var wNameVal = $j("#who_name").val();
+            var  wIdVal= $j("#who_id").val();
+            var  wTypeVal= $j("#who_type").val();
+            $j("#who_name").css("border-color","");
+            $j("#who_name_err").text("");
+            
+
+            // console.log("wIdVal == " + wIdVal);
+            if(wIdVal !='' ){
+                if(wTypeVal == 'Contact'){
+
+                    // console.log("wTypeVal == 'Contact'");
+
+
+                        var sObject = new SObjectModel.Contact();
+                        sObject.retrieve({where: {Id: {eq: wIdVal}}}, function(err, records, event) {
+                            if (err) {
+                                alert(err);
+                                whoFlag=false;
+                            } else {
+                                var result = [];
+                                records.forEach(function(record) {
+                                    var getName = decodeHTMLEntities(record.get('Name'));
+
+                                    if( getName != wNameVal ){
+                                    $j("#who_name").css("border-color","red");
+                                    //console.log("이름과 아이디가 같지않음");
+
+                                    $j("#who_name_err").text("선택 목록에서 옵션을 선택하세요.");
+                                    whoFlag=false;
+
+                                    } else {
+                                        //console.log("이름과 아이디가 같음 ==> 통과");
+                                        whoFlag=true;
+                                    }
+
+                                });
+                                
+                            }
+                        });
+                    } else if(wTypeVal == 'Lead'){
+
+                        //console.log("wTypeVal == 'Lead'");
+
+
+                            var sObject = new SObjectModel.Lead();
+                            sObject.retrieve({where: {Id: {eq: wIdVal}}}, function(err, records, event) {
+                                if (err) {
+                                    alert(err);
+                                    whoFlag=false;
+                                } else {
+                                    var result = [];
+                                    records.forEach(function(record) {
+                                        var getName = decodeHTMLEntities(record.get('Name'));
+                                        if(getName != wNameVal ){
+                                        $j("#who_name").css("border-color","red");
+                                        //console.log("이름과 아이디가 같지않음");
+
+                                        $j("#who_name_err").text("선택 목록에서 옵션을 선택하세요.");
+                                        whoFlag=false;
+
+                                        } else {
+                                            //console.log("이름과 아이디가 같음 ==> 통과");
+                                            whoFlag=true;
+                                        }
+
+                                    });
+                                    
+                                }
+                            });
+                        } else {
+                                console.log("who_type is wrong...");
+                            }
+    
+            } else {
+                
+                $j("#who_name").css("border-color","red");
+                $j("#who_name_err").text("선택 목록에서 옵션을 선택하세요.");
+                whoFlag=false;
+            }
+
+
+
+        }
+
+
+
+        /*
+        _CS 추가
+        what_name input blur 
+        */
+        function check_what_name(){
+            var wNameVal = $j("#what_name").val();
+            var  wIdVal= $j("#what_id").val();
+            var  wTypeVal= $j("#what_type").val();
+            $j("#what_name").css("border-color","");
+            $j("#what_name_err").text("");
+            
+
+            //console.log("wIdVal == " + wIdVal);
+            if(wIdVal !='' ){
+                if(wTypeVal == 'Account'){
+
+                    // console.log("wTypeVal == 'Account'");
+
+
+                        var sObject = new SObjectModel.Account();
+                        sObject.retrieve({where: {Id: {eq: wIdVal}}}, function(err, records, event) {
+                            if (err) {
+                                alert(err);
+                                whatFlag=false;
+                            } else {
+                                var result = [];
+                                records.forEach(function(record) {
+                                    var getName = decodeHTMLEntities(record.get('Name'));
+                                    if(getName != wNameVal ){
+                                    $j("#what_name").css("border-color","red");
+                                    
+
+                                    $j("#what_name_err").text("선택 목록에서 옵션을 선택하세요.");
+                                    whatFlag=false;
+
+                                    } else {
+                                        
+                                        whatFlag=true;
+                                    }
+
+                                });
+                                
+                            }
+                        });
+                    } else if(wTypeVal == 'Opportunity'){
+
+                        // console.log("wTypeVal == 'Opportunity'");
+
+
+                            var sObject = new SObjectModel.Opportunity();
+                            sObject.retrieve({where: {Id: {eq: wIdVal}}}, function(err, records, event) {
+                                if (err) {
+                                    alert(err);
+                                    whatFlag=false;
+                                } else {
+                                    var result = [];
+                                    records.forEach(function(record) {
+                                        var getName = decodeHTMLEntities(record.get('Name'));
+                                        if(getName != wNameVal ){
+                                        $j("#what_name").css("border-color","red");
+                                        
+
+                                        $j("#what_name_err").text("선택 목록에서 옵션을 선택하세요.");
+                                        whatFlag=false;
+
+                                        } else {
+                                            
+                                            whatFlag=true;
+                                        }
+
+                                    });
+                                    
+                                }
+                            });
+                        } else if(wTypeVal == 'Case'){
+
+                            // console.log("wTypeVal == 'Case'");
+
+
+                                var sObject = new SObjectModel.Case();
+                                sObject.retrieve({where: {Id: {eq: wIdVal}}}, function(err, records, event) {
+                                    if (err) {
+                                        alert(err);
+                                        whatFlag=false;
+                                    } else {
+                                        var result = [];
+                                        records.forEach(function(record) {
+                                            
+                                            if(record.get('CaseNumber') != wNameVal ){
+                                            $j("#what_name").css("border-color","red");
+                                            
+
+                                            $j("#what_name_err").text("선택 목록에서 옵션을 선택하세요.");
+                                            whatFlag=false;
+
+                                            } else {
+                                                
+                                                whatFlag=true;
+                                            }
+
+                                        });
+                                        
+                                    }
+                                });
+                            }else{
+                                console.log("what_type is wrong...");
+                            }
+    
+            } else {
+                
+                $j("#what_name").css("border-color","red");
+                $j("#what_name_err").text("선택 목록에서 옵션을 선택하세요.");
+                whatFlag=false;
+            }
+
+
+
+        }
+
+
+
+
+        /*
+        _CS 
+        Service Console Record 가져오기
+        */
+
+        function getWhoRecordBtnClick(){
+            setTimeout(getWhoRecord,200);
+        }
+
+        function getWhoRecord(){
+
+
+            if(selectObjectType == "Contact" ){
+                whoFlag=true;
+                $j("#who_name").css("border-color","");
+                $j("#who_name_err").text("");
+                $j("#who_type").val(selectObjectType);
+                $j("#who_type").trigger("change");
+                
+                $j("#who_id").val(selectId);
+                $j("#who_name").val(selectRecordName);
+                $j("#who_name").attr("disabled",false);
+                
+                $j("#what_type").attr("disabled",false);
+                $j("#what_name").attr("disabled",false);
+                $j("#getWhatBtn").attr("disabled",false);
+
+
+            } else if(selectObjectType == "Lead" ){
+                whoFlag=true;
+                $j("#who_name").css("border-color","");
+                $j("#who_name_err").text("");
+                $j("#who_type").val(selectObjectType);
+                $j("#who_type").trigger("change");
+                $j("#who_id").val(selectId);
+                $j("#who_name").val(selectRecordName);
+                $j("#who_name").attr("disabled",false);
+
+
+                $j("#what_type").attr("disabled",true);
+                $j("#what_type").val("none");
+                changePlaceholder_what("none");
+                
+                $j("#getWhatBtn").attr("disabled",true);
+            
+
+            } else if(selectObjectType == "Account" && personAccount ){
+                whoFlag=true;
+                $j("#who_name").css("border-color","");
+                $j("#who_name_err").text("");
+                $j("#who_type").val('Contact');
+                $j("#who_type").trigger("change");
+                
+                $j("#who_id").val(selectId);
+                $j("#who_name").val(selectRecordName);
+                $j("#who_name").attr("disabled",false);
+                
+                $j("#what_type").attr("disabled",false);
+                $j("#what_name").attr("disabled",false);
+                $j("#getWhatBtn").attr("disabled",false);
+            
+            } 
+            
+            else {
+                // console.log("getWhoRecord fail...");
+                $j("#who_name_err").text("가져올 레코드 탭을 선택 후 가져오기 버튼을 누르세요.");
+                whoFlag=false;
+            }
+
+            if($j("#what_type").val() == "none"){
+                $j("#what_name").attr("disabled",true);
+            }
+
+            
+        }
+
+        
+        function getWhatRecordBtnClick(){
+            setTimeout(getWhatRecord(),200);
+        }
+
+
+        function getWhatRecord(){
+
+            
+            if((selectObjectType == "Account" && !personAccount )|| selectObjectType == "Case" || selectObjectType == "Opportunity"){
+            whatFlag=true;
+            $j("#what_name").css("border-color","");
+            $j("#what_name_err").text("");
+            $j("#what_type").val(selectObjectType);
+            $j("#what_type").trigger("change");
+            $j("#what_type").attr("disabled",false);
+            $j("#what_id").val(selectId);
+            $j("#what_name").val(selectRecordName);
+            $j("#what_name").attr("disabled",false);
+
+            if($j("#what_type").val() == "Lead"){
+                $j("#what_name").attr("disabled",true);
+            } else {
+                $j("#what_name").attr("disabled",false);
+            }
+
+            } else {
+            // console.log("getWhatRecord fail...");
+            $j("#what_name_err").text("가져올 레코드 탭을 선택 후 가져오기 버튼을 누르세요.");
+            whatFlag=false;
+            }
+            
+
+
+        }
+
+
+
+        
+        function progressOn() {
+    
+    
+            var maskHeight = $j(document).height();
+            var maskWidth  = window.document.body.clientWidth;
+            
+            
+            $j('#mask').css({
+                    'width' : maskWidth,
+                    'height': maskHeight,
+                    'opacity' :'0.3',
+                    
+            });
+        
+            $j('#loadingImg').css({
+                'margin-top' : maskHeight/2 - 25,
+                'display' : 'block'
+            });
+        
+            
+            $j('#mask').show();
+
+            
+        }
+ 
+  
+        function progressOff() {
+            
+            $j('#mask, #loadingImg').hide();
+            $j("#loadingImg").css('display', 'none');
+            
+            
+        }
+
+
+        // remoteSObjectModel retrive 시 
+        // 특수문자 치환되서 결과값이 넘어오기 때문에 
+        // 해당 값들 치환 작업이 필요
+        function decodeHTMLEntities (str) {
+            if(str !== undefined && str !== null && str !== '') {
+                str = String(str);
+
+                str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gmi, '');
+                str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
+                var element = document.createElement('div');
+                element.innerHTML = str;
+                str = element.textContent;
+                element.textContent = '';
+            }
+
+            return str;
+        }
+
+        function searchInputEnter(e){
+            if(e.keyCode == 13){
+                
+                // console.log('클릭클릭 엔터로 클릭');
+                e.preventDefault();
+                $j("[id$='searchBtn']").click();
+            }
+        }
+
+
+
+        </script>
+    </header>
+
+  
+
+
+    <body>
+
+        <div id='mask' style='position:absolute; z-index:9000; background-color:#000000; display:none; left:0; top:0; text-align : center;'>
+            <img src="{!URLFOR($Resource.clvs,'img/Spinner.gif')}" style='display: block; margin: 0px auto; width:50px; height: 50px;' id="loadingImg"/>
+        </div>
+
+       <div class="wrapperDiv">
+        <div class="container">
+            
+            
+            <!-- START :: mainDiv -->
+            <div class="mainDiv">
+                <!-- 전화번호 입력 -->
+                
+                    <apex:pageBlock >
+                        <apex:form id="searchForm" onsubmit="">
+                        <label class="slds-form-element__label">전화번호</label>
+                        <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right" id="phoneNumDiv">
+                            <apex:inputText id="phoneNumber" value="{! phoneNumber}" styleClass="slds-input phoneNum_input" onkeypress="return searchInputEnter(event)"  ></apex:inputText> 
+                            <apex:commandButton id="searchBtn" action="{! searchAction}" value="검색" style="margin-left: 10px;" 
+                            styleClass="slds-button slds-button_brand" onclick="progressOn()" reRender="resultForm, searchForm " oncomplete="progressOff(), taskFormReset(),taskDivHideFromButton(true)" /> <!--  검색 후 화면 리랜더 되면서 풀림 oncomplete="progressOff()" 사용x -->
+                            <apex:commandButton id="refreshBtn" action="{! searchRefresh}" value="초기화" style="margin-left: 10px;" styleClass="" reRender="resultForm, searchForm" oncomplete="taskFormReset(),taskDivHideFromButton(false)" />
+                            </div>    
+                            <div class="qaBtnDiv">
+
+                                <div id="messageDiv">
+
+                                <apex:outputText id="waringMsg" rendered="{! warningMsg}" value="{!errorMsg}" style="color:red;"/>
+                                
+                                <span id="sMsg_span" style="display:none; color:blue; font-weight: bolder">상담이력이 저장되었습니다.</span>
+
+                                </div>
+
+                                
+                            
+                            
+                            </div>
+                        
+                        </apex:form>
+
+                        <div id="innerQaBtnDiv">
+                                
+                                <span class="slds-icon_container slds-icon_container_circle slds-icon-action-new-lead sfdc_customBtn " title="리드 등록" onclick="openNewLeadPage()">
+                                    <svg class="slds-icon slds-icon_x-small " aria-hidden="true">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/action-sprite/svg/symbols.svg#new_lead')}"></use>
+                                    </svg>
+                                    <span class="slds-assistive-text"></span>
+                                </span>
+
+
+                                
+                                <span class="slds-icon_container slds-icon_container_circle slds-icon-action-new-contact sfdc_customBtn " title="연락처 등록" onclick="openNewContactPage()">
+                                    <svg class="slds-icon slds-icon_x-small " aria-hidden="true">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/action-sprite/svg/symbols.svg#new_contact')}"></use>
+                                    
+                                    </svg>
+                                    <span class="slds-assistive-text"></span>
+                                </span>
+
+
+                                
+                                <span class="slds-icon_container slds-icon_container_circle slds-icon-action-new-case sfdc_customBtn " title="사례 등록" onclick="openNewCasePage()">
+                                    <svg class="slds-icon slds-icon_x-small " aria-hidden="true">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/action-sprite/svg/symbols.svg#new_case')}"></use>
+                                    
+                                    </svg>
+                                    <span class="slds-assistive-text"></span>
+                                </span>
+
+                                
+                                
+                                <!-- <span class="slds-icon_container slds-icon_container_circle slds-icon-action-log-a-call sfdc_customBtn" title="상담이력 등록" onclick="openTaskForm()">
+                                    <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/action-sprite/svg/symbols.svg#log_a_call')}"></use>
+                                    
+                                    </svg>
+                                    <span class="slds-assistive-text"></span>
+                                </span> -->
+                                
+                                <span class="slds-icon_container slds-icon_container_circle slds-icon-action-new-account sfdc_customBtn" title="계정 등록" onclick="openNewAccountPage_NewRecordModal()">
+                                    <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/action-sprite/svg/symbols.svg#new_account')}"></use>
+                                    
+                                    </svg>
+                                    <span class="slds-assistive-text"></span>
+                                </span>
+                            </div>
+
+                    </apex:pageBlock>
+                
+        <!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+        
+                <!-- 검색 결과 -->
+                <!-- Contact/Lead -->
+                <apex:form id="resultForm">
+                    
+                
+                    <apex:outputPanel rendered="{! IF(OR(contactList.size > 0, leadList.size > 0,  accountList.size > 0), true, false)}">
+                        <!-- <apex:pageBlock title="Contact/Lead/Account"> -->
+                        <apex:pageBlock title="고객정보">
+                            
+                        
+                        <apex:outputPanel rendered="{! IF(contactList.size > 0 , true, false)}">
+                            <span class="custTypeSpan">[Contact]</span>
+                            <table id="searchResultTable" class="slds-table slds-table_bordered slds-table_col-bordered slds-table_fixed-layout slds-table_resizable-cols">
+                                                                
+                                
+                                
+                                <thead >
+                                    <!-- <th style="width:20%;">유형</th> -->
+                                    <th style="width:30%;">이름</th>
+                                    <!-- <th>전화번호</th>
+                                    <th>휴대전화</th> -->
+                                    <th style="width:70%;">회사명</th>
+                                </thead>
+                                <tbody >
+                                    <!-- Contact 정보 -->
+                                    <apex:variable var="contact_count" value="{! 1}"/>
+                                    <apex:repeat value="{! contactList}" var="contact">
+                                        <tr id="contactList{! contact_count}" data-toggle="popover" data-trigger="click" data-popover-content="#a1" data-placement="top">
+                                            <!-- <td>
+                                                <apex:outputText value="Contact"/> 
+                                            </td> -->
+                                            <td>
+                                                <apex:outputLink value="javascript:void(0)" onclick="selectRecord('{! contact.Id}','{! contact.Name }', 'Contact', false , event)">{! contact.Name }</apex:outputLink>
+                                            </td>
+                                         
+                                            <td>
+                                                
+                                                <apex:outputLink value="javascript:void(0)" onclick="selectRecord('{! contact.AccountId}','{! contact.Account.Name }', 'Account', false , event)">{! contact.Account.Name }</apex:outputLink>
+                                            </td>
+                                            <apex:variable var="contact_count" value="{! contact_count + 1}"/>
+                                        </tr>
+                                    </apex:repeat>
+                                    
+                                </tbody>
+                            </table>
+                            </apex:outputPanel>
+
+                            <apex:outputPanel rendered="{! IF(leadList.size > 0 , true, false)}">
+                            <span class="custTypeSpan">[Lead]</span>
+                            <table id="searchResultTable" class="slds-table slds-table_bordered slds-table_col-bordered slds-table_fixed-layout slds-table_resizable-cols">
+                                                                
+                                
+                                
+                                <thead >
+                                    <!-- <th style="width:20%;">유형</th> -->
+                                    <th style="width:30%;">이름</th>
+                                    <!-- <th>전화번호</th>
+                                    <th>휴대전화</th> -->
+                                    <th style="width:70%;">회사명</th>
+                                </thead>
+                                <tbody >
+                                   <!-- Lead 정보 -->
+                                    <apex:variable var="lead_count" value="{! 1}"/>
+                                    <apex:repeat value="{! leadList}" var="lead">
+                                        <tr id="leadList{! lead_count}" data-toggle="popover" data-trigger="click" data-placement="top">
+                                            <!-- <td>
+                                                <apex:outputText value="Lead"/>
+                                            </td> -->
+                                            <td>
+                                                <apex:outputLink value="javascript:void(0)" onclick="selectRecord('{! lead.Id}','{! lead.Name }', 'Lead', false , event)">{! lead.Name }</apex:outputLink>
+                                            </td>
+                                            
+                                            <td>
+                                                <apex:outputText value="{! lead.Company}"/>
+                                            </td>
+                                            <apex:variable var="lead_count" value="{! lead_count + 1}"/>
+                                        </tr>
+                                    </apex:repeat>
+                                    
+                                </tbody>
+                            </table>
+                            </apex:outputPanel>
+
+
+                            <apex:outputPanel rendered="{! IF(accountList.size > 0 , true, false)}">
+                            <span class="custTypeSpan">[Account]</span>
+                            <table id="searchResultTable" class="slds-table slds-table_bordered slds-table_col-bordered slds-table_fixed-layout slds-table_resizable-cols">
+                                                                
+                                
+                                
+                                <thead >
+                                    <!-- <th style="width:20%;">유형</th> -->
+                                    <!-- <th style="width:30%;">이름</th> -->
+                                    <!-- <th>전화번호</th>
+                                    <th>휴대전화</th> -->
+                                    <th style="width:100%;">회사명</th>
+                                </thead>
+                                <tbody >
+                                                                    
+                                    <!-- Account 정보 -->
+                                    <apex:variable var="acct_count" value="{! 1}"/>
+                                    <apex:repeat value="{! accountList}" var="acct">
+                                        <tr id="accountList{! acct_count}" data-toggle="popover" data-trigger="click" data-placement="top">
+                                            <!-- <td style="text-align: center;">
+                                                <apex:outputText value="Account"/>
+                                            </td> -->
+                                            <td  >
+                                                <apex:outputLink value="javascript:void(0)" onclick="selectRecord('{! acct.Id}', '{! acct.Name }','Account', false , event)">{! acct.Name }</apex:outputLink>
+                                            </td>
+                                            
+                                            <apex:variable var="acct_count" value="{! acct_count + 1}"/>
+                                        </tr>
+                                    </apex:repeat>
+
+                                    
+                                </tbody>
+                            </table>
+                            </apex:outputPanel>
+                        </apex:pageBlock>
+                    </apex:outputPanel>
+            
+                </apex:form>
+
+
+                <!-- 하단 상담입력 폼 -->
+                
+                
+
+
+
+                <!-- -->
+
+
+
+            </div>
+            <!-- END :: mainDiv -->
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+            <div>
+                <apex:form id="saveResult">
+                    <apex:inputHidden value="{! checkResult}" id="checkResult"/>
+                    <apex:inputHidden value="{! errorMsg}" id="errorMsg" />
+                </apex:form>
+                <!-- Task 등록 팝업 -->
+                <div class="taskDiv">
+                    <div id="call_result_parent" style="" >
+                    <span class="labelText callResultSpan" style="">통화결과</span>
+                    <select id="call_result"  class="selectList js-example-basic-single" style="" >
+                            
+                        <option value="none">--없음--</option>
+                        <option value="부재중">부재중</option>
+                        <option value="콜백필요">콜백필요</option>
+                        <option value="통화완료" selected="true">통화완료</option>
+
+                    
+                    </select>
+                    </div>
+                    
+                    
+                        <apex:pageBlock title="상담이력 등록">
+                            <span class="labelText">고객정보</span>
+                            <div class="taskInputDiv">
+                               <span id="who_type_parent">
+                                
+                                <select id="who_type" onchange="changePlaceholder_who(this.value)" class="selectList js-example-basic-single">
+                                    <option value="none">--없음--</option>
+                                    <option value="Contact">Contact</option>
+                                    <option value="Lead">Lead</option>
+                                    
+                                </select>
+                                </span>
+                               
+                                    <!-- 기존 -->
+                                    <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right what_search_div">
+                                        <svg class="slds-icon slds-input__icon slds-input__icon_right slds-icon-text-default" aria-hidden="true">
+                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS,'/assets/icons/utility-sprite/svg/symbols.svg#search')}"></use>
+                                        </svg>
+                                        <input type="text" id="who_name" placeholder="" class="slds-input" onfocus="autoComplete_who();" disabled="true" onblur="check_who_name();"/>
+                                        <input type="hidden" id="who_id"/>
+                                    </div> 
+                                    
+
+                                    <button class="slds-button slds-button--neutral" title="고객정보 가져오기" id="getWhoBtn" onclick="getWhoRecordBtnClick();">←</button>
+                                    
+                                </div>    
+                                <div class="search_err_msg_div">
+                                <span id="who_name_err" class="search_err_msg"></span>
+                                </div>
+                            <span class="labelText">관련항목</span>
+                            <div class="taskInputDiv">
+                                    <span id="what_type_parent">
+                                    <select id="what_type" onchange="changePlaceholder_what(this.value)" class="selectList js-example-basic-single">
+                                        <option value="none">--없음--</option>
+                                        <option value="Account">Account</option>
+                                        <option value="Case">Case</option>
+                                        <option value="Opportunity">Opportunity</option>
+
+                                    </select>
+                                </span>
+                                                                               
+                                        <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right what_search_div">
+                                            
+                                            <svg class="slds-icon slds-input__icon slds-input__icon_right slds-icon-text-default" aria-hidden="true" >
+                                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS,'/assets/icons/utility-sprite/svg/symbols.svg#search')}" onclick="alert('!!!!');"></use>
+                                            </svg>
+                                            
+                                            
+                                            <input type="text" id="what_name" placeholder="" class="slds-input" onfocus="autoComplete_what();" 
+                                            disabled="true" onblur="check_what_name()" />
+                                            <input type="hidden" id="what_id"/>
+                                        </div>
+                                        
+                                    
+                                <button class="slds-button slds-button--neutral" title="관련항목 가져오기" id="getWhatBtn" onclick="getWhatRecordBtnClick();">←</button>
+                            </div>
+                            <div class="search_err_msg_div" >
+                            <span id="what_name_err" class="search_err_msg"></span>
+                            </div>
+                                
+                            <!--
+                            <span class="labelText" style="">통화결과</span>
+                            
+                            <div class="taskInputDiv">
+                            <select id="call_result"  class="selectList js-example-basic-single" style="" >
+                            
+                            <option value="none">--없음--</option>
+                            <option value="부재중">부재중</option>
+                            <option value="콜백필요">콜백필요</option>
+                            <option value="통화완료" selected="true">통화완료</option>
+
+                        
+                            </select>
+                            </div>
+                             -->
+                            
+                            <span class="labelText" >상담 내용</span>
+                            
+                        <apex:form onsubmit="false" id="newTaskForm">
+
+                            <div class="taskInputDiv">
+                                <apex:inputTextarea id="description" value="{! newTask.description}" rows="8" style="width: 400px; resize: none;"></apex:inputTextarea>
+                            </div>
+                        </apex:form>
+                        </apex:pageBlock>
+                        <apex:form >
+                        <apex:actionFunction action="{! saveNewTask}" name="saveNewTask" reRender="saveResult" status="myStatus" oncomplete="checkMakeTaskResult();" >
+                           
+                            <apex:param name="whoId" assignTo="{! newTask.whoId}" value=""/>
+                            <apex:param name="whatId" assignTo="{! newTask.whatId}" value=""/>
+                            <apex:param name="description" assignTo="{! newTask.description}" value=""/>
+                            <apex:param name="callType" assignTo="{! newTask.callType}" value=""/>
+                            <apex:param name="callId" assignTo="{! newTask.callId}" value=""/>
+                            <apex:param name="recURL" assignTo="{! newTask.recURL}" value=""/>
+                            <apex:param name="startTime" assignTo="{! newTask.startTime}" value=""/>
+                            <apex:param name="endTime" assignTo="{! newTask.endTime}" value=""/>
+                            <apex:param name="callResult" assignTo="{! newTask.callResult}" value=""/>
+                            <!-- <apex:param name="IsPersonAccount" assignTo="{! newTask.psersonAccount}" value=""/> -->
+                            <apex:param name="whoName" assignTo="{! newTask.whoName}" value=""/>
+                            <apex:param name="whatName" assignTo="{! newTask.whatName}" value=""/>
+
+                        </apex:actionFunction>
+
+                    </apex:form>
+                    
+                    <!-- Task 등록 -->
+                    <button class="slds-button slds-button--neutral" onclick="taskDivOff();" id="taskCancelBtn">취소</button>
+                    <button class="slds-button slds-button_brand" onclick="saveBtnClick();" id="taskSubmitBtn" >등록</button>
+                </div>
+    
+            </div>
+
+        </div>
+        <!-- END :: container -->
+
+    </div>
+<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+    
+    </body>
+</apex:page>

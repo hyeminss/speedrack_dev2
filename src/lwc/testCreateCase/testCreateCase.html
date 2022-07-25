@@ -1,0 +1,209 @@
+<!--
+    2022.07.09 이새미
+    설명 : 신규 AS 작성용 글로벌 액션 테스트
+-->
+<template>
+    01
+    <!-- <div style="height: 1000px;">  -->
+        <br>
+<!-- ========================== [AS처리 ] ========================== -->
+        <div class="slds-box slds-box_xx-small">
+        <lightning-card title="A/S 접수">
+            <div class="myTitle">
+                <!-- <h1><strong>A/S 접수</strong></h1> -->
+            <div class="slds-clearfix">
+                <div class="slds-float_right">
+                  <p style="color:red">{statusText}</p>
+                </div>
+              </div>
+            <div class="slds-form-element__control slds-grid slds-wrap">
+                <div class="slds-size_1-of-4">
+                    <div class="slds-p-around_xx-small">
+                        <lightning-input label="거래처" value={ordInfo.account} disabled="true"></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="slds-p-around_xx-small">
+                        <lightning-input label="주문번호"  value={orderNo} name="orderNo" onchange={handleChange} onkeypress={searchOrderInfo} required="true"></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="slds-p-around_xx-small">
+                        <lightning-input label="A/S접수일"  value={ordInfo.asReqDate} disabled="true"></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="slds-p-around_xx-small">
+                        <lightning-input label="A/S접수 번호"   value={ordInfo.itemName} disabled="true"></lightning-input>
+                    </div>
+                </div>
+                <!-- 줄 바꿈 -->
+                <div class="slds-size_1-of-4">
+                    <div class="slds-p-around_xx-small">
+                        <lightning-input label="거래처연락처"  value={ordInfo.itemName} disabled="true"></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="slds-p-around_xx-small">
+                        <lightning-input label="주문일자"  value={ordInfo.orderDate} disabled="true"></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="slds-p-around_xx-small">
+                        <lightning-input label="온라인주문번호"   value={ordInfo.onlineOrdNo} disabled="true"></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="slds-p-around_xx-small">
+                        <lightning-input label="소비자명"   value={ordInfo.receiverName} disabled="true"></lightning-input>
+                    </div>
+                </div>
+                <!-- 줄 바꿈 -->
+                <div class="slds-size_1-of-4">
+                    <div class="slds-p-around_xx-small">
+                        <lightning-input label="운송장번호"   value={ordInfo.shipNo} disabled="true"></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="slds-p-around_xx-small">
+                        <lightning-input label="택배사"   value={ordInfo.itemName} disabled="true"></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="slds-p-around_xx-small">
+                        <lightning-input label="소비자연락처" name="SRF_RecieverPhone2__c" onchange={handleChange} value={ordInfo.receiverPhone} required="true"></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="slds-p-around_xx-small">
+                        <lightning-input label="소비자주소" name="SRF_ReceiverAddress__c" onchange={handleChange} value={ordInfo.receiverAddress} required="true"></lightning-input>
+                    </div>
+                </div>
+                <!-- 줄 바꿈 -->
+                <div class="slds-size_1-of-4">
+                    <div class="slds-p-around_xx-small">
+                        <lightning-input label="원천AS번호"   value={ordInfo.itemName} disabled="true"></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="slds-p-around_xx-small">
+                        <lightning-input label="최종AS접수일시"   value={ordInfo.itemName} disabled="true"></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-4">
+                    <div class="slds-p-around_xx-small">
+                        <lightning-input label="온라인마켓"   value={ordInfo.onlineMarket} disabled="true"></lightning-input>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </lightning-card>
+        </div>
+<!-- ========================== [ AS처리 품목 ] ========================== -->
+        <div class="slds-box slds-box_xx-small">
+        <lightning-card>
+            <div class="myTitle">
+                <h1><strong>A/S 품목</strong></h1>
+            
+            <div class="slds-p-around_x-small">
+                <lightning-datatable
+                            class="dTable"
+                            key-field="id"
+                            data={bomInfo}
+                            columns={columns}
+                            oncellchange={handleCellValue}
+                            hide-checkbox-column
+                            suppress-bottom-bar>
+                </lightning-datatable>
+            </div>
+        </div>
+        </lightning-card>
+        </div>
+<!-- ========================== [ A/S 분류, 제품 분류 ] ========================== -->
+        
+        <div class="slds-form-element__control slds-grid slds-wrap">
+            
+            <div class="slds-size_5-of-8">
+                <div class="slds-box slds-box_xx-small">
+                <lightning-card>
+                    <div class="myTitle">
+                        <h1><strong>A/S 분류</strong></h1>
+                    </div>
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-size_1-of-2">
+                            <div class="slds-p-around_x-small">
+                                <lightning-combobox name="ASType"
+                                                    value={ordInfo.claimType}
+                                                    options={claimOptions}
+                                                    label="클레임 분류"
+                                                    onchange={handleChange}
+                                                    placeholder="- 선택 -">
+                                </lightning-combobox>
+                            </div>
+                        </div>
+                        <div class="slds-size_1-of-2">
+                            <div class="slds-p-around_x-small">
+                                <lightning-combobox name="ItemType"
+                                                    value={}
+                                                    label="제품 분류"
+                                                    placeholder="- 선택 -">
+                                </lightning-combobox>
+                            </div>
+                        </div>
+                    </div>
+                </lightning-card>
+                </div>
+            </div>
+<!-- ========================== [ 유무상 구분 및 맞교환/ PickList + Checkbox ] ========================== -->
+            <div class="slds-size_3-of-8">
+                <div class="slds-box slds-box_xx-small">
+                <lightning-card>
+                    <div class="myTitle">
+                        <h1><strong>유무상 구분 및 맞교환 여부</strong></h1>
+                    </div>
+                    <div class="slds-size_5-of-8">
+                        <div class="slds-p-around_xx-small">
+                            <lightning-combobox name="freeOrNot"
+                                                value={ordInfo.umChargeType}
+                                                options={chargeOptions}
+                                                onchange={handleChange}
+                                                label="유무상 구분"
+                                                placeholder="- 선택 -">
+                            </lightning-combobox>
+                        </div>
+                    </div>
+                    <div class="slds-size_3-of-8">
+                        <div class="slds-p-around_xx-small">
+                            <!-- <lightning-input type="checkbox" name="SRF_IsChange__c" checked="" onchange={handleChange}></lightning-input> -->
+                        </div>
+                    </div>
+                </lightning-card>
+                </div>
+            </div>
+
+        </div>
+<!-- ========================== [ 영업 전달 내용 ] ========================== -->
+            <div class="slds-box slds-box_xx-small">
+            <div class="slds-form-element__control slds-grid slds-wrap">
+            <div class="slds-size_1-of-1">
+                <lightning-card>
+                    <div class="myTitle">
+                        <h1><strong>영업 전달 사항</strong></h1>
+                    </div>
+                    <div class="slds-p-horizontal_xxx-small">
+                    <lightning-input-rich-text name="SRF_SaelsRemark__c" onchange={handleChange}></lightning-input-rich-text>
+                    </div>
+                </lightning-card>
+            </div>
+        </div>
+    </div>
+    <br>
+    <!-- <lightning-button-group> -->
+        <div class="slds-clearfix">
+            <div class="slds-float_right">
+                <lightning-button icon-name="utility:save" class="slds-p-horizontal_xx-small" label="A/S 저장" onclick={saveRecord} ></lightning-button>
+            </div>
+        </div>
+    <!-- </lightning-button-group> -->
+<!-- </div> -->
+</template>

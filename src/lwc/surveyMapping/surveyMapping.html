@@ -1,0 +1,20 @@
+<!--
+ - Created by user on 2022-07-04.
+ -->
+
+<!-- Survey Mapping -->
+<template>
+    <div class="slds-p-bottom_large slds-p-left_small" style="width:100%">
+        <lightning-input type="text" placeholder="Field1__c" required="true" label="고객 필드" class="nameF" value={nameField} onchange={nameFieldChange}></lightning-input>
+        <lightning-input type="text" placeholder="Field2__c" required="true" label="휴대폰 필드" value={phoneField} onchange={phoneFieldChange}></lightning-input>
+        <lightning-input type="text" placeholder="Field3__c" required="true" label="고객매핑 필드" value={lookupField} onchange={lookupFieldChange}></lightning-input>
+        <lightning-input type="text" placeholder="Object__c" required="true" label="설문정보 오브젝트" value={objectName} onchange={objectNameChange}></lightning-input>
+        <br>
+        <lightning-button-group>
+            <lightning-button onclick= {mapping} label="저장" class="slds-m-bottom_small"></lightning-button>
+        </lightning-button-group>
+        <br>
+        {resultText}
+<!--        <lightning-output-field field-name=-->
+    </div>
+</template>

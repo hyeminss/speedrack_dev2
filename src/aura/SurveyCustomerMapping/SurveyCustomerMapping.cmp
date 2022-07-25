@@ -1,0 +1,3 @@
+<aura:component implements="force:lightningQuickAction">
+    <c:surveyMapping></c:surveyMapping>
+</aura:component>

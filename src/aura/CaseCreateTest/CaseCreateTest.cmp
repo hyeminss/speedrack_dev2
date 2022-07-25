@@ -1,0 +1,8 @@
+<!--
+ - Created by user on 2022-07-06.
+ -->
+
+<aura:component implements="force:lightningQuickAction" description="CaseCreateTest">
+    <aura:html tag="style"> .slds-modal__container { min-width: 70vw; } </aura:html>
+    <c:createNewAS></c:createNewAS>
+</aura:component>

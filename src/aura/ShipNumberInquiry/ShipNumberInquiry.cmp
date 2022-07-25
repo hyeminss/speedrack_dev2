@@ -1,0 +1,25 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" controller="SRC_InquiryOrderShipNo">
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:attribute name="recordId" type="String" access="global" />
+    <aura:attribute name="order" type="SRO_Order1__c[]"/>
+    <aura:attribute name="order2" type="SRO_Order1__c[]"/>
+    <aura:attribute name="order3" type="SRO_Order1__c[]"/>
+    <div class="slds"> 
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th scope="col"><span class="slds-truncate">송장번호</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <aura:iteration items="{!v.order}" var="ord">
+                    <tr class="slds-hint-parent">
+                        <td><a href="{!ord.ShipNoURL}" style="color: darkgray;" target="_blank">{!ord.SRF_InvoiceNo1__c}</a>
+                            <a href="{!ord.ShipNoURL}" style="color: darkgray;" target="_blank">{!ord.SRF_InvoiceNo2__c}</a>
+                            <a href="{!ord.ShipNoURL}" style="color: darkgray;" target="_blank">{!ord.SRF_InvoiceNo3__c}</a></td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+    </div>
+</aura:component>

@@ -1,0 +1,276 @@
+<apex:page sidebar="false" showHeader="false" docType="html-5.0" id="thePage" lightningStylesheets="true" controller="CtiLoginPageController" >
+    
+    <apex:includeScript value="{!URLFOR($Resource.clvs,'jquery.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Mytro,'adapter.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Mytro,'customEvent.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Mytro,'janus-0.4.4.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Mytro,'Stately.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Mytro,'webrtc-phone.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Mytro,'wsJanusApp.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Mytro,'wsJanusCapi.js')}"/>
+    
+    <head>
+        <apex:stylesheet value="{!URLFOR($Resource.slds,'/assets/styles/salesforce-lightning-design-system.css')}"  />
+        <apex:stylesheet value="{!URLFOR($Resource.slds,'/assets/styles/salesforce-lightning-design-system.min.css')}"  />
+    <style>
+        body{
+            width:400px;
+            height: 500px;
+            overflow: hidden;
+        }
+    .logo {
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 10%;
+        margin-top: 10%;
+        width:100px;
+        height: 100px;
+    }
+    .logo img{
+        width:100px;
+        height: 100px;
+    }
+    .slds-spinner_container{
+        display:none;
+    }
+    #loginForm{
+        display: inline-block;
+    }
+
+
+      /* The Modal (background) */
+      .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+    
+        /* Modal Content/Box */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%; /* Could be more or less, depending on screen size */                          
+        }
+        /* The Close Button */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .loginFormDiv{
+            margin-left: auto;
+            margin-right: auto;
+            width: 200px;
+        }
+
+        .lb_b{
+            font-weight: bolder;
+            margin-top:10px;
+        }
+
+        .errMsg{
+            color:red; 
+            width:inherit;
+        }
+
+       
+        
+    </style>
+
+    <script type="text/javascript">
+
+            var savedUserId = window.localStorage.getItem("userId");
+            var savedExtension = window.localStorage.getItem("extension");
+        
+            var settingFlag = true;
+            
+            window.onload = function(){
+
+            // $("#txtUserID").val(savedUserId); 
+            // $("#txtExtension").val(savedExtension); 
+
+            $("[id$='txtUserID']").val(savedUserId);
+            $("[id$='txtExtension']").val(savedExtension);
+
+                
+
+            
+            }
+
+           
+
+
+    function submitLogin(){
+
+        var uId = $("#txtUserID").val();
+        var uEx = $("#txtExtension").val();
+           
+        loginDo(uId,uEx);
+ 
+        }
+
+        function activeLogin(){
+                    console.log('enableClickToDial');
+                    $("#loginDiv").css("display","none");
+                    console.log('loginDiv display none');
+                    $("#mainDiv").css("display","block");
+
+
+                    
+                    login();
+
+        }
+
+        function checkLoginResult(){
+            // alert('checkLoginResult()');
+
+            var checkLogin =  $("[id$='checkLogin']").val();
+            
+            var savedUserId = $("[id$='txtUserID']").val();
+            var savedExtension = $("[id$='txtExtension']").val();
+
+            
+            
+            window.localStorage.setItem("userId",savedUserId);
+            window.localStorage.setItem("extension",savedExtension);
+
+            moveToSoftphonPage();
+            
+        }
+
+
+    </script>
+
+</head>
+    <body>
+        <div id='mask' style='position:absolute; z-index:9000; background-color:#000000; display:none; left:0; top:0; text-align : center;'>
+            <img src="{!URLFOR($Resource.clvs,'/img/Spinner.gif')}" style='display: block; margin: 0px auto; width:50px; height: 50px;' id="loadingImg"/>
+        </div>
+    
+    <!-- loginDiv -->
+     <div id="loginDiv">
+        <div class="slds-modal__container" >
+            
+            <div class="logo">
+                <img src="{!URLFOR($Resource.clvs,'clvs_logo.png')}" align="center"/>
+            </div>
+            <div class="slds-form-element">
+                <div class="slds-form-element__control">
+                    <div class="loginFormDiv">
+                        
+                        <apex:form id="checkLoginForm">
+                            <apex:outputText id="errorMsg" styleClass="errMsg" value="{!errorMsg}" rendered="{!IF(AND(errorMsg != null,errorMsg != '') ,true,false)}"/>
+                            <apex:inputHidden value="{!checkLogin}" id="checkLogin"/>
+                        </apex:form>
+                    
+                    
+                        <span id ="errMsg" style="color:red;"></span><br/>
+                        <apex:form id="loginForm" onsubmit="return false" style="" >
+                         
+                            <label class="lb_b">&nbsp;&nbsp;사용자 ID</label> <br/>
+                            <input type="text" id="txtUserID" required="true" /> <br/>
+                            
+                            <label class="lb_b">&nbsp;&nbsp;내선번호</label> <br/>
+                            <input type="text" id="txtExtension" required="true"/> <br/>
+
+                            <!-- <label class="lb_b">&nbsp;&nbsp;패스워드</label> <br/>
+                            <input  type="password" id="txtPassword"/> <br/>
+                             -->
+                            <!-- <label class="lb_b">&nbsp;&nbsp;전화번호 뒤 4자리</label> <br/>
+                            <input type="text" id= "txtExtension"   value="{!extension}" label="전화번호 뒤 4자리" required="true" /><br/> -->
+
+                            <input type="hidden" id="txtBasePage" placeholder="Base Page"/><br/>
+                            
+                            
+                            <div class="slds-align_absolute-center" style="text-align: center;">
+                                <button class="slds-button slds-button--brand" onclick="submitLogin()">로그인</button>
+                                
+                            </div>
+                            <input type="hidden" id="txtPeerID" style="display:none;"/>
+                            <input type="hidden" id="txtSiteID" value="AREX-00000" style="display:none;"/>
+                            <textarea id="edtLogger" style="display:none"/>
+
+                        </apex:form>
+                                                
+                        <apex:form >
+                              <apex:actionFunction action="{!loginDo}" name="loginDo" rerender="checkLoginForm" status="myStatus" oncomplete="checkLoginResult();">
+                              <apex:param assignTo="{!txtUserID}" name="uId" value=""/>    
+                              <apex:param assignTo="{!extension}" name="ex" value=""/>    
+                              </apex:actionFunction>
+
+                              <apex:actionFunction action="{!moveToSoftphonPage}" name="moveToSoftphonPage"></apex:actionFunction>
+                              
+                        </apex:form>
+                        
+                    </div>
+
+                </div>
+            </div>
+            
+        </div>
+    </div> 
+    <!-- / loginDiv END -->
+
+    <!-- mainDiv -->
+    <!-- <div id="mainDiv" style="display:none;">
+
+        <input type="tel" id="phoneNumber"/>
+        <button onclick = "makeCall()">전화걸기</button>
+
+    </div> -->
+    <!-- / mainDiv END -->
+
+
+
+
+
+    <!-- inbound alert modal -->
+
+
+    <!-- <div id="inboundAlertModal" class="modal"> -->
+ 
+        <!-- Modal content -->
+        <!-- <div class="modal-content">
+          <span class="close" onclick="closeInboundModal();">&times;</span>                                                               
+          <p id="inbound-content"></p>
+        </div> -->
+   
+      <!-- </div> -->
+
+    <!-- / inbound alert modal END-->
+
+
+
+
+    <div id="lightning"></div>
+
+
+
+    
+
+</body>
+
+<script type="text/javascript">
+
+</script>
+
+
+
+</apex:page>
